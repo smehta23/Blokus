@@ -6,7 +6,7 @@ public class Game {
     }
     
     public static void main (String [] args) {
-        zxc
+       System.out.println();
     }
 
 }
