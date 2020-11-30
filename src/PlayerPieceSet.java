@@ -12,20 +12,11 @@ public class PlayerPieceSet extends JComponent{
 
     public PlayerPieceSet(Color c) {
         this.c = c;
-        this.setBackground(Color.black);
-        GridLayout layout = new GridLayout(width, height, 1, 1);
+        GridLayout layout = new GridLayout(height, width, 10, 10);
         this.setLayout(layout);
-        Pieces [] pieceStructures = Pieces.class.getEnumConstants();
-        for (Pieces structure : pieceStructures) {
-            int initX, initY;
-            initX = initY = 0;
-            for (int i = 0; i < p.length; i++) {
-                for (int j = 0; j < p[0].length; j++) {
-                    gc.fillRect(initX, initY, 20, 20);
-                    initX += 20;
-                }
-                initY+=20;
-            }
+        GamePieces [] pieceStructures = GamePieces.class.getEnumConstants();
+        for (GamePieces structure : pieceStructures) {
+            this.add(new Piece(structure.getStructure(), c));
         }
     }
     

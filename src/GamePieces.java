@@ -3,7 +3,7 @@ import java.util.*;
 
 import javax.swing.JComponent;
 
-public enum Pieces {
+public enum GamePieces {
     
     I1(new int[][] {{1}}),
     I2(new int[][] {{1, 1}}),
@@ -29,7 +29,7 @@ public enum Pieces {
     
     private final int [][] piece;
     
-    private Pieces (int [][] piece) {
+    private GamePieces (int [][] piece) {
         this.piece = piece;
     }
     
