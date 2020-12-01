@@ -1,8 +1,13 @@
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.GridLayout;
+import java.awt.Rectangle;
 import java.awt.event.*;
 import javax.swing.*;
+import java.awt.dnd.*;
+import java.awt.datatransfer.*;
 
 public class PlayerPieceSet extends JComponent{
     
@@ -12,11 +17,15 @@ public class PlayerPieceSet extends JComponent{
 
     public PlayerPieceSet(Color c) {
         this.c = c;
-        GridLayout layout = new GridLayout(height, width, 10, 10);
-        this.setLayout(layout);
+        FlowLayout fl = new FlowLayout();
+        this.setLayout(fl);
         GamePieces [] pieceStructures = GamePieces.class.getEnumConstants();
         for (GamePieces structure : pieceStructures) {
-            this.add(new Piece(structure.getStructure(), c));
+            JButton pieceButton = new JButton();
+            Piece p = new Piece(structure.getStructure(), c);
+            pieceButton.add(p);
+            pieceButton.setPreferredSize(p.getPreferredSize());
+            this.add(pieceButton);
         }
     }
     
