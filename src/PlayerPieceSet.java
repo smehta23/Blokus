@@ -27,34 +27,22 @@ public class PlayerPieceSet extends JComponent{
         }
     }
     
-    private class PieceButtonListener implements ActionListener {
-        private Piece piece;
-        public PieceButtonListener(Piece piece) {
-            this.piece = piece;
-        }
-        public void actionPerformed (ActionEvent e) {
-            setMovablePiece(piece);
-        }
-    }
+
     
     @Override
     public void paintComponent(Graphics gc) {
         gc.setColor(c);
     }
     
-    public void setMovablePiece(Piece piece) {
-        //place piece on board
-        int [][] pieceStructure = piece.getStructure();
-        for (int i = 0; i < pieceStructure.length; i++) {
-            for (int j = 0; j < pieceStructure[0].length; j++) {
-                if (pieceStructure[i][j] == 1) {
-                    State.setBoardColors(i, j, Color.RED);
-                }
-            }
+    
+    private class PieceButtonListener implements ActionListener {
+        private Piece piece;
+        public PieceButtonListener(Piece piece) {
+            this.piece = piece;
         }
-        //repaint();
+        public void actionPerformed (ActionEvent e) {
+            State.setPieceToMove(piece);
+        }
     }
-    
-    
 
 }

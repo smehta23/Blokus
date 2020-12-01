@@ -67,9 +67,5 @@ public class Piece extends JComponent {
     }
     
     
-//    public int[][] getStructure () {
-//        return piece;
-//    }
-    
     
 }
