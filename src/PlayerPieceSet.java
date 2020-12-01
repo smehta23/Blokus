@@ -2,17 +2,14 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.*;
 import javax.swing.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
 
+@SuppressWarnings("serial")
 public class PlayerPieceSet extends JComponent{
     
-    private final int width = 2;
-    private final int height = 11;
     private Color c;
 
     public PlayerPieceSet(Color c) {
@@ -22,9 +19,11 @@ public class PlayerPieceSet extends JComponent{
         GamePieces [] pieceStructures = GamePieces.class.getEnumConstants();
         for (GamePieces structure : pieceStructures) {
             JButton pieceButton = new JButton();
-            Piece p = new Piece(structure.getStructure(), c);
-            pieceButton.add(p);
-            pieceButton.setPreferredSize(p.getPreferredSize());
+            Piece piece = new Piece(structure.getStructure(), c);
+            pieceButton.add(piece);
+            //TransferHandler th = new TransferHandler();
+            //pieceButton.setTransferHandler(new TransferHandler());
+            pieceButton.setPreferredSize(piece.getPreferredSize());
             this.add(pieceButton);
         }
     }

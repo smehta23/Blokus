@@ -4,30 +4,53 @@ import javax.swing.*;
 
 public class Board extends JComponent {
     
-    private final int width = 20;
-    private final int height = 20;
+    private static final int BOARD_WIDTH = 20;
+    private static final int BOARD_HEIGHT = 20;
     private Square [][] squares;
 
     public Board() {
         this.setBackground(Color.black);
-        GridLayout layout = new GridLayout(width, height, 1, 1);
+        GridLayout layout = new GridLayout(BOARD_WIDTH, BOARD_HEIGHT, 1, 1);
         this.setLayout(layout);
-        squares = new Square [width][height];
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                squares[i][j] = new Square(new Dimension(30, 30));
+        squares = new Square [BOARD_WIDTH][BOARD_HEIGHT];
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                squares[i][j] = new Square();
                 this.add(squares[i][j]);
             }
         }
+        
+        DragListener dragListener = new DragListener();
+        this.addMouseMotionListener(dragListener);
+    }
+    
+    private class DragListener extends MouseMotionAdapter{
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            Point pos = e.getPoint();
+            //+1 because each square has an adjacent 1 px border
+            int x = pos.x/(Square.getDefaultSize() + 1);
+            int y = pos.y/(Square.getDefaultSize() + 1);
+            if (x < BOARD_WIDTH && y < BOARD_HEIGHT) {
+//                for (Square[] tile : squares) {
+//                    for (Square square: tile) {
+//                        square.setColor(Color.GRAY);
+//                    }
+//                }
+                squares[y][x].setColor(Color.RED);
+                repaint();
+            }
+        }
+        
     }
     
     @Override
     public void paintComponent(Graphics gc) {
         this.setBackground(Color.black);
-        GridLayout layout = new GridLayout(width, height, 1, 1);
+        GridLayout layout = new GridLayout(BOARD_WIDTH, BOARD_HEIGHT, 1, 1);
         this.setLayout(layout);
-        for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
                 this.add(squares[i][j]);
             }
         }

@@ -2,11 +2,23 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 
-public class Square extends JComponent {
+import javax.swing.AbstractAction;
+
+@SuppressWarnings("serial")
+public class Square extends JLabel {
     
     private Color c;
     private Dimension d;
+    
+    public Square() {
+        this.c = Color.GRAY;
+        d = new Dimension (30, 30);
+    }
 
     public Square(Dimension d) {
         this.c = Color.GRAY;
@@ -24,6 +36,9 @@ public class Square extends JComponent {
         return d;
     }
     
+    public static int getDefaultSize() {
+        return 30;
+    }
     
     public void setColor(Color c) {
         this.c = c;
