@@ -8,16 +8,29 @@ public class State {
     private static final int BOARD_WIDTH = 20;
     private static final int BOARD_HEIGHT = 20;
     private static List<Color[][]> boardHistory = new LinkedList<Color[][]> ();
-    public static Color [][] boardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
+    private static Color [][] boardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
+    
+    public static void setBoardToDefault() {
+        for (int i = 0; i < boardColors.length; i++) {
+            for (int j = 0; j < boardColors[0].length; j++) {
+                boardColors[i][j] = Color.GRAY;
+            }
+        }
+        boardHistory.add(Arrays.copyOf(boardColors, boardColors.length));
+    }
     
     public static Color [][] getBoardColors() {
-        return Arrays.copyOf(boardColors, boardColors.length);
+        return boardColors;
     }
     
 
+    public static void setBoardColors(int row, int col, Color c){
+        boardColors[row][col] = c;
+    }
+    
     public static void setBoardColors(Color [][] colors){
         boardColors = colors;
-        boardHistory.add(colors);
+        boardHistory.add(Arrays.copyOf(boardColors, boardColors.length));
     }
     
 }

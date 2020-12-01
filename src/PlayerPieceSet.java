@@ -48,7 +48,7 @@ public class PlayerPieceSet extends JComponent{
         for (int i = 0; i < pieceStructure.length; i++) {
             for (int j = 0; j < pieceStructure[0].length; j++) {
                 if (pieceStructure[i][j] == 1) {
-                    State.boardColors[i][j] = Color.RED;
+                    State.setBoardColors(i, j, Color.RED);
                 }
             }
         }

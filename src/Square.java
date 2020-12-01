@@ -27,6 +27,7 @@ public class Square extends JLabel {
     
     public Square(Color c) {
         this.c = c;
+        d = new Dimension (30, 30);
     }
     
     public Square(Color c, Dimension d) {
