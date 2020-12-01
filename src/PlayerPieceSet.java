@@ -21,10 +21,14 @@ public class PlayerPieceSet extends JComponent{
             JButton pieceButton = new JButton();
             Piece piece = new Piece(structure.getStructure(), c);
             pieceButton.add(piece);
-            //TransferHandler th = new TransferHandler();
-            //pieceButton.setTransferHandler(new TransferHandler());
+            pieceButton.addActionListener(new PieceButtonListener());
             pieceButton.setPreferredSize(piece.getPreferredSize());
             this.add(pieceButton);
+        }
+    }
+    
+    private class PieceButtonListener implements ActionListener {
+        public void actionPerformed (ActionEvent e) {
         }
     }
     

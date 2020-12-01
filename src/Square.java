@@ -25,6 +25,15 @@ public class Square extends JLabel {
         this.d = d;
     }
     
+    public Square(Color c) {
+        this.c = c;
+    }
+    
+    public Square(Color c, Dimension d) {
+        this.c = c;
+        this.d = d;
+    }
+    
     @Override
     public void paintComponent(Graphics gc) {
         gc.setColor(c);
