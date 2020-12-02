@@ -51,14 +51,7 @@ public class Board extends JComponent {
             int x = pos.x/(Square.getDefaultSize() + 1);
             int y = pos.y/(Square.getDefaultSize() + 1);
             if (x < BOARD_WIDTH && y < BOARD_HEIGHT && x >= 0 && y >= 0) {
-                
-                for (int i = 0; i < squares.length; i++) {
-                    for (int j = 0; j < squares[i].length; j++) {
-                        squares[i][j].setColor(State.getBoardColors()[i][j]);
-                    }
-                }
                 State.moveLastPlacedPiece(y, x);
-                //squares[y][x].setColor(Color.RED);
                 repaint();
             }
         }
@@ -72,14 +65,9 @@ public class Board extends JComponent {
             //+1 because each square has an adjacent 1 px border
             int x = pos.x/(Square.getDefaultSize() + 1);
             int y = pos.y/(Square.getDefaultSize() + 1);
-            State.placePieceOnBoard(y, x);
+            
             if (x < BOARD_WIDTH && y < BOARD_HEIGHT && x >= 0 && y >= 0) {
-                for (int i = 0; i < squares.length; i++) {
-                    for (int j = 0; j < squares[i].length; j++) {
-                        squares[i][j].setColor(State.getBoardColors()[i][j]);
-                    }
-                }
-                //squares[y][x].setColor(Color.RED);
+                State.placePieceOnBoard(y, x);
                 repaint();
             }
         }
