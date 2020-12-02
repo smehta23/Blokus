@@ -25,6 +25,7 @@ public class Board extends JComponent {
         ClickListener clickListener = new ClickListener();
         this.addMouseMotionListener(dragListener);
         this.addMouseListener(clickListener);
+        
     }
     
     @Override
@@ -45,7 +46,6 @@ public class Board extends JComponent {
     private class DragListener extends MouseMotionAdapter{
         @Override
         public void mouseDragged(MouseEvent e) {
-            System.out.println("Registering");
             Point pos = e.getPoint();
             //+1 because each square has an adjacent 1 px border
             int x = pos.x/(Square.getDefaultSize() + 1);

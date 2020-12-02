@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
@@ -22,6 +24,14 @@ public class Game implements Runnable {
         panel.add(board);
         PlayerPieceSet pset = new PlayerPieceSet(Color.RED);
         panel.add(pset);
+        JButton rotPiece = new JButton("Rotate Piece");
+        rotPiece.addActionListener( new ActionListener() {
+            public void actionPerformed (ActionEvent e) {
+                State.rotatePiece();
+                board.repaint();
+            }
+        });
+        panel.add(rotPiece);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // frame.getContentPane().setSize(500, 1000);

@@ -25,6 +25,7 @@ public class PlayerPieceSet extends JComponent{
             pieceButton.setPreferredSize(piece.getPreferredSize());
             this.add(pieceButton);
         }
+        
     }
     
 

@@ -11,6 +11,7 @@ public class State {
     private static LinkedList<Color[][]> boardHistory = new LinkedList<Color[][]>();
     private static Color[][] boardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
     private static Piece pieceToMove;
+    private static Point pieceToMovePos;
     private static boolean togglePlacePiece = false;
 
     public static void setBoardToDefault() {
@@ -30,7 +31,7 @@ public class State {
     }
 
     public static void setBoardColors(Color[][] colors) {
-        //boardHistory.add(Arrays.copyOf(boardColors, boardColors.length));
+        boardHistory.add(deepCopyOfBoard(boardColors));
         boardColors = colors;
     }
 
@@ -38,26 +39,29 @@ public class State {
         pieceToMove = piece;
 
     }
+    
+    private static Color[][] deepCopyOfBoard(Color [][] currentBoard){
+        Color [][] clonedBoardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                clonedBoardColors[i][j] = new Color(currentBoard[i][j].getRGB());
+            }
+        }
+        return clonedBoardColors;
+    }
 
     public static void placePieceOnBoard(int y, int x) {
+        pieceToMovePos = new Point(x, y);
         int[][] pieceStructure = pieceToMove.getStructure();
         // validating where the piece is initially placed; returning if piece would go
         // out of bounds
         if (pieceStructure.length + y - 1 >= BOARD_HEIGHT || pieceStructure[0].length + x - 1 >= BOARD_WIDTH) {
             System.out.println("Cannot place piece here: (" + y + ", " + x + ")");
-            System.out.println((pieceStructure.length + y) + ", " + (pieceStructure[0].length + x));
             return;
         }
-        //deep copy of current boardColors
-        Color [][] clonedBoardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
-        for (int i = 0; i < BOARD_HEIGHT; i++) {
-            for (int j = 0; j < BOARD_WIDTH; j++) {
-                clonedBoardColors[i][j] = new Color(boardColors[i][j].getRGB());
-            }
-        }
+        
+        Color [][] clonedBoardColors = deepCopyOfBoard(boardColors);
         boardHistory.add(clonedBoardColors);
-        System.out.println("Prev placed on linkedlist\nBOARD COLORS");
-        printArray(boardHistory.getLast());
         for (int i = y; i < y + pieceStructure.length; i++) {
             for (int j = x; j < x + pieceStructure[0].length; j++) {
                 if (pieceStructure[i - y][j - x] == 1) {
@@ -65,40 +69,29 @@ public class State {
                 }
             }
         }
-        System.out.println("BOARD COLORS");
-        printArray(boardHistory.getLast());
         
     }
     
-    public static void printArray(Color [][] arr) {
-        int cnt = 0;
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                if (arr[i][j].equals(Color.RED)) {
-                    System.out.print("R ");
-                    cnt++;
-                }
-                else System.out.print("G ");
-            }
-            System.out.println();
-            
-        }
-        System.out.println(cnt);
-    }
 
     public static void moveLastPlacedPiece(int y, int x) {
-        if (boardHistory.size() < 1) { 
-            System.out.println("Nothing");
-            return; 
-        }
-        System.out.println("LList Size: " + boardHistory.size());
+        if (boardHistory.size() < 1) { return; }
         Color [][] prev = boardHistory.removeLast();
-        printArray(prev);
-        System.out.println("setting to previous");
         State.setBoardColors(prev);
-        //State.setBoardToDefault();
-        
         State.placePieceOnBoard(y, x);
+    }
+    
+    public static void rotatePiece() {
+        int[][] pieceStructure = pieceToMove.getStructure();
+        int[][] rotatedPieceStructure = new int[pieceStructure[0].length][pieceStructure.length];
+        for (int i = 0; i < rotatedPieceStructure.length; i++) {
+            for (int j = 0; j < rotatedPieceStructure[i].length; j++) {
+                if (pieceStructure[j][i] == 1) {
+                    rotatedPieceStructure[rotatedPieceStructure.length - i - 1][j] = 1;
+                }
+            }
+        }
+        pieceToMove = new Piece(rotatedPieceStructure, Color.RED);
+        moveLastPlacedPiece(pieceToMovePos.y, pieceToMovePos.x);
     }
 
 }
