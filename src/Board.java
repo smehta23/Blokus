@@ -31,8 +31,9 @@ public class Board extends JComponent {
     @Override
     public void paintComponent(Graphics gc) {
         this.setBackground(Color.black);
-        GridLayout layout = new GridLayout(BOARD_WIDTH, BOARD_HEIGHT, 1, 1);
-        this.setLayout(layout);
+        //GridLayout layout = new GridLayout(BOARD_WIDTH, BOARD_HEIGHT, 1, 1);
+        //this.setLayout(layout);
+        this.removeAll();
         for (int i = 0; i < BOARD_HEIGHT; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 squares[i][j].setColor(State.getBoardColors()[i][j]);

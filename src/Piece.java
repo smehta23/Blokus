@@ -8,7 +8,7 @@ import javax.swing.TransferHandler;
 
 import javax.swing.JComponent;
 
-public class Piece extends JComponent {
+public class Piece extends JComponent{
     
     //private final int [][] piece;
     
@@ -65,6 +65,24 @@ public class Piece extends JComponent {
     public Dimension getPreferredSize() {
         return new Dimension(pieceDimension.width + 15, pieceDimension.height + 15);
     }
+    
+    
+    @Override
+    public boolean equals(Object o) {
+        boolean result = false;
+        if (o instanceof Piece) {
+            Piece u = (Piece) o;
+            result = Arrays.deepEquals(u.getStructure(), this.getStructure());
+        }
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getStructure().length;
+    }
+    
+
     
     
     

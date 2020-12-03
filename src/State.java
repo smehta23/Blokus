@@ -5,14 +5,53 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class State {
-
-    private static final int BOARD_WIDTH = 20;
-    private static final int BOARD_HEIGHT = 20;
+    
+    public static final Color RED = new Color (255, 0, 0);
+    public static final Color BLUE = new Color (0, 0, 255);
+    public static final Color GREEN = new Color (0, 204, 0);
+    public static final Color YELLOW = new Color (255, 255, 45);
+    public static final int NUM_OF_PLAYERS = 4;
+    public static final int BOARD_WIDTH = 20;
+    public static final int BOARD_HEIGHT = 20;
+    public static final Color START_COLOR = Color.GRAY;
+    public static final Color [] GAME_COLORS = {BLUE, GREEN, RED, YELLOW};
+    
     private static LinkedList<Color[][]> boardHistory = new LinkedList<Color[][]>();
+    private static Player [] players = {new Player(), new Player(), new Player(), new Player()};
+            //new Player[NUM_OF_PLAYERS];    
     private static Color[][] boardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
     private static Piece pieceToMove;
     private static Point pieceToMovePos;
-    private static boolean togglePlacePiece = false;
+    private static Player currentPlayer = players[0];
+    private static int turnNumber = 0;
+    
+//    public static void createPlayer() {
+//        Player newPlayer = new Player();
+//        if (players.length == 0) {
+//            currentPlayer = newPlayer;
+//        }
+//        players[newPlayer.getNumber() - 1] = newPlayer; 
+//        System.out.println(players[newPlayer.getNumber() - 1].getName());
+//    }
+    
+    public static Player getCurrentPlayer() {
+        return new Player(
+                currentPlayer.getPieces(),
+                currentPlayer.getName(),
+                currentPlayer.getColor(),
+                currentPlayer.getNumber()
+            );
+    }
+    
+    public static void nextTurn() {
+        finishTurn();
+        turnNumber++;
+        currentPlayer = players[turnNumber % NUM_OF_PLAYERS];
+    }
+    
+    private static void finishTurn() {
+        currentPlayer.pieceMoved(pieceToMove);
+    }
 
     public static void setBoardToDefault() {
         for (int i = 0; i < boardColors.length; i++) {
@@ -54,18 +93,17 @@ public class State {
         pieceToMovePos = new Point(x, y);
         int[][] pieceStructure = pieceToMove.getStructure();
         // validating where the piece is initially placed; returning if piece would go
-        // out of bounds
+        // out of bounds of the array
         if (pieceStructure.length + y - 1 >= BOARD_HEIGHT || pieceStructure[0].length + x - 1 >= BOARD_WIDTH) {
             System.out.println("Cannot place piece here: (" + y + ", " + x + ")");
             return;
         }
         
-        Color [][] clonedBoardColors = deepCopyOfBoard(boardColors);
-        boardHistory.add(clonedBoardColors);
+        boardHistory.add(deepCopyOfBoard(boardColors));
         for (int i = y; i < y + pieceStructure.length; i++) {
             for (int j = x; j < x + pieceStructure[0].length; j++) {
                 if (pieceStructure[i - y][j - x] == 1) {
-                    State.setBoardColors(i, j, Color.RED);
+                    State.setBoardColors(i, j, currentPlayer.getColor());
                 }
             }
         }
@@ -90,7 +128,7 @@ public class State {
                 }
             }
         }
-        pieceToMove = new Piece(rotatedPieceStructure, Color.RED);
+        pieceToMove = new Piece(rotatedPieceStructure, currentPlayer.getColor());
         moveLastPlacedPiece(pieceToMovePos.y, pieceToMovePos.x);
     }
 

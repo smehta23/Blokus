@@ -16,12 +16,12 @@ public class Square extends JLabel {
     private Dimension d;
     
     public Square() {
-        this.c = Color.GRAY;
+        this.c = State.START_COLOR;
         d = new Dimension (30, 30);
     }
 
     public Square(Dimension d) {
-        this.c = Color.GRAY;
+        this.c = State.START_COLOR;
         this.d = d;
     }
     
