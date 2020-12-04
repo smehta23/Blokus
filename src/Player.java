@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -56,6 +57,22 @@ public class Player{
     public Set<Piece> getPieces(){
         Set<Piece> copyOfPieces = new HashSet<Piece>(this.pieces); 
         return copyOfPieces;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        boolean result = false;
+        if (o instanceof Player) {
+            Player u = (Player) o;
+            result = this.number == u.getNumber() && this.name.equals(u.getName()) 
+                    && this.color.equals(u.getColor()) && this.pieces.equals(u.getPieces());
+        }
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.number;
     }
 
 }

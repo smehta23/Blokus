@@ -61,7 +61,6 @@ public class Game implements Runnable {
         frame.pack();
         frame.setResizable(true);
         frame.setVisible(true);
-        frame.setSize(new Dimension(1500, 1000));
     }
 
     public static void main(String[] args) {

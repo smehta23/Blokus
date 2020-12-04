@@ -3,6 +3,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.event.*;
+import java.util.Set;
+
 import javax.swing.*;
 import java.awt.dnd.*;
 import java.awt.datatransfer.*;
@@ -10,21 +12,24 @@ import java.awt.datatransfer.*;
 @SuppressWarnings("serial")
 public class PlayerPieceSet extends JComponent{
     
-    private Player p;
-    private Color c;
+    private Player player;
+    private Color color;
+    private Set<Piece> pieces;
 
     public PlayerPieceSet() {
-        this.p = State.getCurrentPlayer();
-        this.c = this.p.getColor();
+        this.player = State.getCurrentPlayer();
+        this.color = player.getColor();
+        this.pieces = player.getPieces();
         FlowLayout fl = new FlowLayout();
         this.setLayout(fl);
-        for (Piece piece : this.p.getPieces()) {
-            JButton pieceButton = new JButton();
-            Piece pieceModel = new Piece(piece.getStructure(), c);
-            pieceButton.add(pieceModel);
-            pieceButton.addActionListener(new PieceButtonListener(piece));
-            pieceButton.setPreferredSize(piece.getPreferredSize());
-            this.add(pieceButton);
+        for (Piece piece : this.pieces) {
+//            JButton pieceButton = new JButton();
+//            Piece pieceModel = new Piece(piece.getStructure(), color);
+//            pieceButton.add(pieceModel);
+//            pieceButton.addActionListener(new PieceButtonListener(piece));
+//            pieceButton.setPreferredSize(piece.getPreferredSize());
+//            this.add(pieceButton);
+            this.add(piece);
         }
     }
     
@@ -32,24 +37,28 @@ public class PlayerPieceSet extends JComponent{
     
     @Override
     public void paintComponent(Graphics gc) {
-        gc.setColor(c);
-        if (State.getCurrentPlayer().equals(this.p)) {
-            System.out.println("haflway repainting pset");
-            return;
-        }
-        
-//        FlowLayout fl = new FlowLayout();
-//        this.setLayout(fl);
-//        System.out.println(this.p.getPieces().size());
-//        for (Piece piece : this.p.getPieces()) {
+
+        this.player = State.getCurrentPlayer();
+        this.color = player.getColor();
+        this.pieces = player.getPieces();
+        gc.setColor(this.color);
+        System.out.println(this.player.getName() + this.color);
+//        if (State.getCurrentPlayer().equals(this.player)) {
+//            System.out.println("haflway repainting pset");
+//            return;
+//        }
+        this.removeAll();
+        //this.setLayout(new FlowLayout());
+        for (Piece piece : this.pieces) {
 //            JButton pieceButton = new JButton();
-//            Piece pieceModel = new Piece(piece.getStructure(), this.c);
+//            Piece pieceModel = new Piece(piece.getStructure(), this.color);
 //            pieceButton.add(pieceModel);
-//            //pieceButton.addActionListener(new PieceButtonListener(piece));
 //            pieceButton.setPreferredSize(piece.getPreferredSize());
 //            this.add(pieceButton);
-//        }
-//        System.out.println("fULL repainting pset");
+//            pieceButton.addActionListener(new PieceButtonListener(piece));
+            System.out.println("adding a piece");
+            this.add(piece);
+        }
     }
     
     
@@ -58,9 +67,10 @@ public class PlayerPieceSet extends JComponent{
         public PieceButtonListener(Piece piece) {
             this.piece = piece;
         }
+        @Override
         public void actionPerformed (ActionEvent e) {
             State.setPieceToMove(piece);
-            repaint();
+            //repaint();
         }
     }
 

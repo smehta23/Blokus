@@ -7,8 +7,9 @@ import java.awt.datatransfer.*;
 import javax.swing.TransferHandler;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 
-public class Piece extends JComponent{
+public class Piece extends JPanel{
     
     //private final int [][] piece;
     

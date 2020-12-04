@@ -12,12 +12,13 @@ import javax.swing.AbstractAction;
 @SuppressWarnings("serial")
 public class Square extends JLabel {
     
+    public static final int SQUARE_LENGTH = 30;
     private Color c;
     private Dimension d;
     
     public Square() {
         this.c = State.START_COLOR;
-        d = new Dimension (30, 30);
+        d = new Dimension (SQUARE_LENGTH, SQUARE_LENGTH);
     }
 
     public Square(Dimension d) {

@@ -33,11 +33,11 @@ public class Board extends JComponent {
         this.setBackground(Color.black);
         //GridLayout layout = new GridLayout(BOARD_WIDTH, BOARD_HEIGHT, 1, 1);
         //this.setLayout(layout);
-        this.removeAll();
+        //this.removeAll();
         for (int i = 0; i < BOARD_HEIGHT; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 squares[i][j].setColor(State.getBoardColors()[i][j]);
-                this.add(squares[i][j]);
+                //this.add(squares[i][j]);
             }
         }
     }
@@ -92,7 +92,12 @@ public class Board extends JComponent {
         
     }
     
-    
+//    @Override
+//    public Dimension getPreferredSize() {
+//        return new Dimension(
+//                Square.SQUARE_LENGTH * BOARD_WIDTH, 
+//                Square.SQUARE_LENGTH * BOARD_HEIGHT);
+//    }
     
 
 }
