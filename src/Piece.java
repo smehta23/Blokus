@@ -10,6 +10,7 @@ public class Piece extends JPanel{
     //private final int [][] piece;
     
     private Color c;
+    private String name;
     private final Dimension pieceDimension = new Dimension (5, 5);
     private final Dimension squareDimension = new Dimension (10, 10);
     private int[][] pieceStructure;
@@ -30,9 +31,16 @@ public class Piece extends JPanel{
         }
         pieceDimension.height = initY;
         pieceDimension.width = initX;
-//        this.setName(GamePieces.get(pieceStructure).name());
+        name = GamePieces.getName(pieceStructure);
+        if (name == null) {
+            System.out.println("name is null");
+        }
         
         
+    }
+    
+    public String getName() {
+        return name;
     }
     
     public int[][] getStructure() {

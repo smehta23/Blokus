@@ -30,7 +30,6 @@ public class Game implements Runnable {
             public void actionPerformed (ActionEvent e) {
                 State.rotatePlacedPiece();
                 board.repaint();
-                
             }
         });
         panel.add(rotPiece);

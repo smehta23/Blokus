@@ -52,10 +52,18 @@ public enum GamePieces {
     }
   
     //This method can be used for reverse lookup purpose
-    public static GamePieces get(int[][] struct) 
+    public static String getName(int[][] struct) 
     {
-        System.out.println(lookup.size());
-        return lookup.get(struct);
+        
+        for (Map.Entry<int[][], GamePieces> e : lookup.entrySet()) {
+            if (Arrays.deepEquals(e.getKey(), struct)) {
+                return e.getValue().name();
+            }
+                
+        }
+
+        System.out.println("lol not working");
+        return null;
     }
 
     

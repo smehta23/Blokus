@@ -70,19 +70,29 @@ public class State {
     }
 
     public static void setPieceToMove(Piece piece) {
-        if (pieceToMove!=null && !pieceToMove.equals(piecePrevMoved)) {
-            piecePrevMoved = new Piece(pieceToMove.getStructure(), pieceToMove.getColor());
-        } else {
-            piecePrevMoved = null;
+
+        if (!piece.equals(pieceToMove)) {
+            if (pieceToMove!=null) {
+                piecePrevMoved = new Piece(pieceToMove.getStructure(), pieceToMove.getColor());
+            }
+            
+            pieceToMove = piece;
         }
+//        
+//        if (pieceToMove!=null && !pieceToMove.equals(piecePrevMoved)) {
+//            System.out.println("pieceToMove size " + pieceToMove.getStructure().length);
+//            piecePrevMoved = new Piece(pieceToMove.getStructure(), pieceToMove.getColor());
+//        } else {
+//            piecePrevMoved = null;
+//        }
 //        try {
 //            System.out.println("piecePrevMoved " + piecePrevMoved.getColor());
 //        } catch (NullPointerException e){
 //            System.out.println("piecePrevMoved null");
 //        }
         
-        
-        pieceToMove = piece;
+//        
+//        pieceToMove = piece;
 //        try {
 //            System.out.println("pieceToMove " + pieceToMove.getColor());
 //        }
@@ -114,6 +124,8 @@ public class State {
         }
         else {
             //boardHistory.add(deepCopyOfBoard(boardColors));
+            System.out.println(piecePrevMoved);
+            System.out.println(piecePrevMoved.getColor() + " " + pieceToMove.getColor());
             System.out.println("noYEEEHAW");
             System.out.println(piecePrevMoved.getColor());
             State.moveLastPlacedPiece(y, x);
@@ -135,11 +147,10 @@ public class State {
     }
     
     private static void movePiece(int y, int x) {
-        //boardHistory.add(deepCopyOfBoard(boardColors));
+        boardHistory.add(deepCopyOfBoard(boardColors));
         pieceToMovePos = new Point(x, y);
         int[][] pieceStructure = pieceToMove.getStructure();
-        // validating where the piece is initially placed; returning if piece would go
-        // out of bounds of the array
+        // validating where the piece is placed; returning if piece would go out of bounds of the array
         if (pieceStructure.length + y - 1 >= BOARD_HEIGHT || pieceStructure[0].length + x - 1 >= BOARD_WIDTH) {
             System.out.println("Cannot place piece here: (" + y + ", " + x + ")");
             return;
@@ -154,6 +165,8 @@ public class State {
             }
         }
     }
+    
+    
     
     
     private static Color[][] deepCopyOfBoard(Color [][] currentBoard){
