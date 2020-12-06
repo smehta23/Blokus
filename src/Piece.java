@@ -2,13 +2,9 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.util.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
-import javax.swing.TransferHandler;
-
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+@SuppressWarnings("serial")
 public class Piece extends JPanel{
     
     //private final int [][] piece;
@@ -34,12 +30,17 @@ public class Piece extends JPanel{
         }
         pieceDimension.height = initY;
         pieceDimension.width = initX;
+//        this.setName(GamePieces.get(pieceStructure).name());
         
         
     }
     
     public int[][] getStructure() {
         return Arrays.copyOf(pieceStructure, pieceStructure.length);
+    }
+    
+    public Color getColor() {
+        return new Color(this.c.getRGB());
     }
     
     @Override
@@ -73,7 +74,8 @@ public class Piece extends JPanel{
         boolean result = false;
         if (o instanceof Piece) {
             Piece u = (Piece) o;
-            result = Arrays.deepEquals(u.getStructure(), this.getStructure());
+            result = Arrays.deepEquals(u.getStructure(), this.getStructure())
+                    && u.getColor().equals(this.getColor());
         }
         return result;
     }

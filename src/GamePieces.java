@@ -37,5 +37,27 @@ public enum GamePieces {
         return piece;
     }
     
+  //****** Reverse Lookup Implementation************//
+    
+    //Lookup table
+    private static Map<int[][], GamePieces> lookup = new HashMap<>();
+  
+    //Populate the lookup table on loading time
+    static
+    {
+        for(GamePieces gp : GamePieces.values())
+        {
+            lookup.put(gp.getStructure(), gp);
+        }
+    }
+  
+    //This method can be used for reverse lookup purpose
+    public static GamePieces get(int[][] struct) 
+    {
+        System.out.println(lookup.size());
+        return lookup.get(struct);
+    }
+
+    
     
 }

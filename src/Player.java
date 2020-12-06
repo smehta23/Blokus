@@ -1,6 +1,4 @@
 import java.awt.Color;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -35,11 +33,17 @@ public class Player{
     }
     
     public void pieceMoved(Piece p) {
-        pieces.remove(p);
+        this.pieceMoved(p.getStructure());
     }
     
     public void pieceMoved(int [][] pieceStructure) {
-        pieces.remove(new Piece(pieceStructure, color));
+        boolean removed = false;
+        int rotateDegree = 0;
+        while (!removed && rotateDegree <= 360) {
+            removed = pieces.remove(new Piece(pieceStructure, color));
+            pieceStructure = State.ccRotation(pieceStructure);
+            rotateDegree+=90;
+        }
     }
     
     public String getName() {

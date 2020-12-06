@@ -6,14 +6,12 @@ import java.awt.event.*;
 import java.util.Set;
 
 import javax.swing.*;
-import java.awt.dnd.*;
-import java.awt.datatransfer.*;
 
 @SuppressWarnings("serial")
 public class PlayerPieceSet extends JComponent{
     
     private Player player;
-    private Color color;
+    public Color color;
     private Set<Piece> pieces;
 
     public PlayerPieceSet() {
@@ -22,15 +20,9 @@ public class PlayerPieceSet extends JComponent{
         this.pieces = player.getPieces();
         FlowLayout fl = new FlowLayout();
         this.setLayout(fl);
-        for (Piece piece : this.pieces) {
-//            JButton pieceButton = new JButton();
-//            Piece pieceModel = new Piece(piece.getStructure(), color);
-//            pieceButton.add(pieceModel);
-//            pieceButton.addActionListener(new PieceButtonListener(piece));
-//            pieceButton.setPreferredSize(piece.getPreferredSize());
-//            this.add(pieceButton);
-            this.add(piece);
-        }
+//        for (Piece piece : this.pieces) {
+//            this.add(piece);
+//        }
     }
     
 
@@ -41,34 +33,26 @@ public class PlayerPieceSet extends JComponent{
         this.player = State.getCurrentPlayer();
         this.color = player.getColor();
         this.pieces = player.getPieces();
-        gc.setColor(this.color);
-        System.out.println(this.player.getName() + this.color);
-//        if (State.getCurrentPlayer().equals(this.player)) {
-//            System.out.println("haflway repainting pset");
-//            return;
-//        }
+        //gc.setColor(this.color);
+
         this.removeAll();
-        //this.setLayout(new FlowLayout());
+//        FlowLayout fl = new FlowLayout();
+//        this.setLayout(fl);
         for (Piece piece : this.pieces) {
-//            JButton pieceButton = new JButton();
-//            Piece pieceModel = new Piece(piece.getStructure(), this.color);
-//            pieceButton.add(pieceModel);
-//            pieceButton.setPreferredSize(piece.getPreferredSize());
-//            this.add(pieceButton);
-//            pieceButton.addActionListener(new PieceButtonListener(piece));
-            System.out.println("adding a piece");
+            piece.addMouseListener(new PieceSelectedListener(piece));
             this.add(piece);
         }
     }
     
     
-    private class PieceButtonListener implements ActionListener {
+    private class PieceSelectedListener extends MouseAdapter {
         private Piece piece;
-        public PieceButtonListener(Piece piece) {
+        public PieceSelectedListener(Piece piece) {
             this.piece = piece;
         }
         @Override
-        public void actionPerformed (ActionEvent e) {
+        public void mouseClicked (MouseEvent e) {
+            System.out.println("Piece selected.");
             State.setPieceToMove(piece);
             //repaint();
         }
