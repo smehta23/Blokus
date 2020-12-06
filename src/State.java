@@ -17,7 +17,6 @@ public class State {
     private static LinkedList<Color[][]> boardHistory = new LinkedList<Color[][]>();
     private static Player [] players = {new Player(), new Player(), new Player(), new Player()};
     private static Color[][] boardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
-    //temp all public
     public static Piece pieceToMove;
     public static Piece piecePrevMoved;
     public static Point pieceToMovePos;
@@ -36,6 +35,7 @@ public class State {
     public static void nextTurn() {
         finishTurn();
         turnNumber++;
+        System.out.println(turnNumber);
         currentPlayer = players[turnNumber % NUM_OF_PLAYERS];
     }
     

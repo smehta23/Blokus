@@ -16,12 +16,8 @@ public class Game implements Runnable {
         JPanel panel = new JPanel();
         frame.getContentPane().add(panel);
         
-        JLabel currentPlayerLabel = new JLabel(
-                State.getCurrentPlayer().getName() + "\n" 
-                + State.currentPlayer.getPieces().size() + "\n" +
-                        State.pieceToMove + "\n" + 
-                        State.piecePrevMoved + "\n");
-        panel.add(currentPlayerLabel);
+        StateLabel stateLabel = new StateLabel();
+        panel.add(stateLabel);
         
         Board board = new Board ();
         panel.add(board);
@@ -42,14 +38,10 @@ public class Game implements Runnable {
         JButton nextTurn = new JButton("Next Turn");
         nextTurn.addActionListener( new ActionListener() {
             public void actionPerformed (ActionEvent e) {
-                
-                currentPlayerLabel.setText(
-                        State.getCurrentPlayer().getName() + "\n" 
-                                + State.currentPlayer.getPieces().size() + "\n"
-                                        );
                 State.nextTurn();
                 board.repaint();
                 pset.repaint();
+                stateLabel.repaint();
             }
         });
         panel.add(nextTurn);
@@ -58,6 +50,7 @@ public class Game implements Runnable {
         frame.pack();
         frame.setResizable(true);
         frame.setVisible(true);
+        frame.setSize(1500, 1000);
     }
 
     public static void main(String[] args) {
