@@ -71,9 +71,21 @@ public class Piece extends JPanel{
         pieceDimension.width = initX;
     }
     
+    public void toggleSelected() {
+        squareDimension.width = 15;
+        squareDimension.height = 15;
+        repaint();
+    }
+    
+    public void toggleDeselected() {
+        squareDimension.width = 10;
+        squareDimension.height = 10;
+        repaint();
+    }
+    
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(pieceDimension.width + 15, pieceDimension.height + 15);
+        return new Dimension(pieceDimension.width + 20, pieceDimension.height + 20);
     }
     
     

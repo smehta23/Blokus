@@ -73,9 +73,11 @@ public class State {
         if (!piece.equals(pieceToMove)) {
             if (pieceToMove!=null) {
                 piecePrevMoved = new Piece(pieceToMove.getStructure(), pieceToMove.getColor());
+                System.out.println("piecePrevMoved: " + piecePrevMoved);
             }
             
-            pieceToMove = piece;
+            pieceToMove = new Piece(piece.getStructure(), piece.getColor());
+            System.out.println("pieceToMove: " + pieceToMove);
         }
     }
     
@@ -111,18 +113,11 @@ public class State {
     
     public static int [][] ccRotation(int[][] pieceStructure) {
         int[][] rotatedPieceStructure = new int[pieceStructure[0].length][pieceStructure.length];
-//        for (int i = 0; i < rotatedPieceStructure.length; i++) {
-//            for (int j = 0; j < rotatedPieceStructure[i].length; j++) {
-//                if (pieceStructure[j][i] == 1) {
-//                    rotatedPieceStructure[rotatedPieceStructure.length - i - 1][j] = 1;
-//                }
-//            }
-//        }
-        int h = pieceStructure.length;
-        int w = pieceStructure[0].length;
-        for (int col = 0; col < w; col++) {
-            for (int row = 0; row < h; row++) {
-                rotatedPieceStructure[col][h - row - 1] = pieceStructure[row][col]; // swap coordinates
+        for (int i = 0; i < rotatedPieceStructure.length; i++) {
+            for (int j = 0; j < rotatedPieceStructure[i].length; j++) {
+                if (pieceStructure[j][i] == 1) {
+                    rotatedPieceStructure[rotatedPieceStructure.length - i - 1][j] = 1;
+                }
             }
         }
         return rotatedPieceStructure;
@@ -137,9 +132,85 @@ public class State {
             return;
         }
         
-        
+        //validating first move being at one of the board's corners
+        boolean boardCornerTouch = false;
         for (int i = y; i < y + pieceStructure.length; i++) {
             for (int j = x; j < x + pieceStructure[0].length; j++) {
+                if (pieceStructure[i - y][j - x] == 1) {
+                    if ((i == 0 && j == 0) || 
+                            (i == BOARD_HEIGHT-1 && j == 0) || 
+                            (i == 0 && j == BOARD_WIDTH-1 ) ||
+                            (i == BOARD_HEIGHT-1 && j == BOARD_WIDTH-1)) {
+                        boardCornerTouch = true;
+                    }
+                }
+            }
+        }
+        if (!boardCornerTouch && currentPlayer.getPiecesSize() == 21) {
+            System.out.println("The piece must be placed adjacent to a board corner.");
+            return;
+        }
+        
+        
+        //validating using Blokus rules--corners must be of same color except on first turn
+        boolean cornerSameColorTouch = false;
+        for (int i = y; i < y + pieceStructure.length; i++) {
+            for (int j = x; j < x + pieceStructure[0].length; j++) {
+                if (pieceStructure[i - y][j - x] == 1) {
+                    if (validateIndex (i-1, j-1) && boardColors[i-1][j-1].equals(pieceToMove.getColor())) {
+                        cornerSameColorTouch = true;
+                    } else if (validateIndex (i+1, j+1) && boardColors[i+1][j+1].equals(pieceToMove.getColor())) {
+                        cornerSameColorTouch = true;
+                    } else if (validateIndex (i+1, j-1) && boardColors[i+1][j-1].equals(pieceToMove.getColor())) {
+                        cornerSameColorTouch = true;
+                    } else if (validateIndex (i-1, j+1) && boardColors[i-1][j+1].equals(pieceToMove.getColor())) {
+                        cornerSameColorTouch = true;
+                    }
+                }
+            }
+        }
+        if (!cornerSameColorTouch && currentPlayer.getPiecesSize() < 21) {
+            System.out.println("Piece not touching corner of another piece with the same color.");
+            return;
+        }
+        
+        //validating using Blokus rules--no edge touch
+        for (int i = y; i < y + pieceStructure.length; i++) {
+            for (int j = x; j < x + pieceStructure[0].length; j++) {
+                if (pieceStructure[i - y][j - x] == 1) {
+                    if (validateIndex (i-1, j) && boardColors[i-1][j].equals(pieceToMove.getColor())) {
+                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
+                        return;
+                    } else if (validateIndex (i+1, j) && boardColors[i+1][j].equals(pieceToMove.getColor())) {
+                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
+                        return;
+                    } else if (validateIndex (i, j-1) && boardColors[i][j-1].equals(pieceToMove.getColor())) {
+                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
+                        return;
+                    } else if (validateIndex (i, j+1) && boardColors[i][j+1].equals(pieceToMove.getColor())) {
+                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
+                        return;
+                    }
+                }
+            }
+        }
+        
+        
+        //validating using Blokus rules--no overlap with pieces already on the board
+        for (int i = y; i < y + pieceStructure.length; i++) {
+            for (int j = x; j < x + pieceStructure[0].length; j++) {
+                if (pieceStructure[i - y][j - x] == 1 && !boardColors[i][j].equals(Color.GRAY)) {
+                    System.out.println("Another piece is already here.");
+                    return;
+                }
+            }
+        }
+        
+        
+        //updating the board
+        for (int i = y; i < y + pieceStructure.length; i++) {
+            for (int j = x; j < x + pieceStructure[0].length; j++) {
+                //coloring in board if array index of array representing piece is 1
                 if (pieceStructure[i - y][j - x] == 1) {
                     State.setBoardColors(i, j, currentPlayer.getColor());
                 }
@@ -160,6 +231,10 @@ public class State {
         return clonedBoardColors;
     }
     
+    
+    private static boolean validateIndex(int row, int col) {
+        return row >= 0 && row < boardColors.length && col >= 0 && col<boardColors[0].length;
+    }
     
     
 

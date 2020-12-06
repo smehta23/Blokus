@@ -36,10 +36,17 @@ public class GamePiecesTest {
     }
     
     @Test
-    public void removePieceFromSet() {
+    public void removePieceFromSetUnrotated() {
         Player player1 = new Player();
         int [][] struct = 
             {{0, 1, 0}, {1, 1, 1}};
+        boolean removalSuccess = player1.pieceMoved(new Piece(struct, player1.getColor()));
+        assertTrue(removalSuccess);
+    }
+    
+    @Test
+    public void removePieceFromSetRotated() {
+        Player player1 = new Player();
         int [][] struct2 = 
             {{1, 0}, {1, 1}, {1, 0}};
         boolean removalSuccess = player1.pieceMoved(new Piece(struct2, player1.getColor()));

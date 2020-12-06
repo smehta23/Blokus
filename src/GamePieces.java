@@ -69,7 +69,6 @@ public enum GamePieces {
             }
                 
         }
-        System.out.println("Returning null");
         return null;
     }
 

@@ -53,6 +53,10 @@ public class PlayerPieceSet extends JComponent{
         @Override
         public void mouseClicked (MouseEvent e) {
             System.out.println("Piece selected.");
+            for (Piece piece : pieces) {
+                piece.toggleDeselected();
+            }
+            piece.toggleSelected();
             State.setPieceToMove(piece);
             //repaint();
         }
