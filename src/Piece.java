@@ -82,15 +82,29 @@ public class Piece extends JPanel{
         boolean result = false;
         if (o instanceof Piece) {
             Piece u = (Piece) o;
-            result = Arrays.deepEquals(u.getStructure(), this.getStructure())
-                    && u.getColor().equals(this.getColor());
+            //result = u.getName().equals(this.getName());
+            result = u.getName().equals(this.getName()) && u.getColor().equals(this.getColor());
+//            int rotateDegree = 0;
+//            int [][] struct = u.getStructure();
+//            while (!result && rotateDegree <= 360) {
+//                result = Arrays.deepEquals(struct, this.getStructure())
+//                        && u.getColor().equals(this.getColor());
+//                struct = State.ccRotation(struct);
+//                rotateDegree+=90;
+//            }
+            
         }
         return result;
     }
 
     @Override
     public int hashCode() {
-        return this.getStructure().length;
+        return this.getStructure().length * this.getStructure()[0].length;
+    }
+    
+    @Override
+    public String toString() {
+        return name + " " + c.toString();
     }
     
 

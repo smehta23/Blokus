@@ -14,7 +14,8 @@ public class Player{
     public Player() {
         this.name = "Player" + playerNumber;
         this.number = playerNumber;
-        this.color = State.GAME_COLORS[playerNumber - 1];
+        System.out.println(playerNumber);
+        this.color = State.GAME_COLORS[number - 1];
         this.pieces = new HashSet<Piece>();
         GamePieces [] gamePieces = GamePieces.class.getEnumConstants();
         for (GamePieces piece : gamePieces) {
@@ -32,18 +33,20 @@ public class Player{
         this.number = number;
     }
     
-    public void pieceMoved(Piece p) {
-        this.pieceMoved(p.getStructure());
+    public boolean pieceMoved(Piece p) {
+        return pieces.remove(p);
+        //this.pieceMoved(p.getStructure());
     }
     
     public void pieceMoved(int [][] pieceStructure) {
-        boolean removed = false;
-        int rotateDegree = 0;
-        while (!removed && rotateDegree <= 360) {
-            removed = pieces.remove(new Piece(pieceStructure, color));
-            pieceStructure = State.ccRotation(pieceStructure);
-            rotateDegree+=90;
-        }
+        pieceMoved(new Piece(pieceStructure, color));
+//        boolean removed = false;
+//        int rotateDegree = 0;
+//        while (!removed && rotateDegree <= 360) {
+//            removed = pieces.remove(new Piece(pieceStructure, color));
+//            pieceStructure = State.ccRotation(pieceStructure);
+//            rotateDegree+=90;
+//        }
     }
     
     public String getName() {
@@ -61,6 +64,10 @@ public class Player{
     public Set<Piece> getPieces(){
         Set<Piece> copyOfPieces = new HashSet<Piece>(this.pieces); 
         return copyOfPieces;
+    }
+    
+    public int getPiecesSize() {
+        return pieces.size();
     }
     
     @Override

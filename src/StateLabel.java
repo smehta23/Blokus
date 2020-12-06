@@ -23,7 +23,7 @@ public class StateLabel extends JComponent {
         this.add(playerNameLabel);
         turnNumberLabel = new JLabel("Turn Number: " + State.turnNumber+"");
         this.add(turnNumberLabel);
-        pieceSetSizeLabel = new JLabel("Player Piece Set Size: " + State.currentPlayer.getPieces().size() + "");
+        pieceSetSizeLabel = new JLabel("Player Piece Set Size: " + State.currentPlayer.getPiecesSize() + "");
         this.add(pieceSetSizeLabel);
         if (State.pieceToMove!=null) {
             pieceSelectedLabel = new JLabel("Piece Selected is " + State.pieceToMove.getName());

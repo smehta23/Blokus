@@ -65,7 +65,6 @@ public class State {
     }
 
     public static void setBoardColors(Color[][] bc) {
-        //boardHistory.add(deepCopyOfBoard(boardColors));
         boardColors = deepCopyOfBoard(bc);
     }
 
@@ -78,38 +77,18 @@ public class State {
             
             pieceToMove = piece;
         }
-//        
-//        if (pieceToMove!=null && !pieceToMove.equals(piecePrevMoved)) {
-//            System.out.println("pieceToMove size " + pieceToMove.getStructure().length);
-//            piecePrevMoved = new Piece(pieceToMove.getStructure(), pieceToMove.getColor());
-//        } else {
-//            piecePrevMoved = null;
-//        }
-//        try {
-//            System.out.println("piecePrevMoved " + piecePrevMoved.getColor());
-//        } catch (NullPointerException e){
-//            System.out.println("piecePrevMoved null");
-//        }
-        
-//        
-//        pieceToMove = piece;
-//        try {
-//            System.out.println("pieceToMove " + pieceToMove.getColor());
-//        }
-//        catch (NullPointerException e){
-//            System.out.println("pieceToMove null");
-//        }
     }
     
     public static void moveLastPlacedPiece(int y, int x) {
         if (boardHistory.size() < 1) { return; }
-        Color [][] prev = boardHistory.removeLast();
+        Color [][] prev = boardHistory.getLast();
         State.setBoardColors(prev);
         State.movePiece(y, x);
     }
     
     public static void rotatePlacedPiece() {
         int[][] pieceStructure = pieceToMove.getStructure();
+        piecePrevMoved = new Piece(pieceToMove.getStructure(), pieceToMove.getColor());
         pieceToMove = new Piece(ccRotation(pieceStructure), currentPlayer.getColor());
         moveLastPlacedPiece(pieceToMovePos.y, pieceToMovePos.x);
     }
@@ -118,16 +97,12 @@ public class State {
 
     public static void placePieceOnBoard(int y, int x) {
         if (piecePrevMoved == null || !piecePrevMoved.getColor().equals(pieceToMove.getColor())) {
+            //System.out.println(piecePrevMoved);
+            piecePrevMoved = new Piece(pieceToMove.getStructure(), pieceToMove.getColor());
             boardHistory.add(deepCopyOfBoard(boardColors));
-            System.out.println("YEEEHAW");
             State.movePiece(y,x);
         }
         else {
-            //boardHistory.add(deepCopyOfBoard(boardColors));
-            System.out.println(piecePrevMoved);
-            System.out.println(piecePrevMoved.getColor() + " " + pieceToMove.getColor());
-            System.out.println("noYEEEHAW");
-            System.out.println(piecePrevMoved.getColor());
             State.moveLastPlacedPiece(y, x);
         }
     }
@@ -136,18 +111,24 @@ public class State {
     
     public static int [][] ccRotation(int[][] pieceStructure) {
         int[][] rotatedPieceStructure = new int[pieceStructure[0].length][pieceStructure.length];
-        for (int i = 0; i < rotatedPieceStructure.length; i++) {
-            for (int j = 0; j < rotatedPieceStructure[i].length; j++) {
-                if (pieceStructure[j][i] == 1) {
-                    rotatedPieceStructure[rotatedPieceStructure.length - i - 1][j] = 1;
-                }
+//        for (int i = 0; i < rotatedPieceStructure.length; i++) {
+//            for (int j = 0; j < rotatedPieceStructure[i].length; j++) {
+//                if (pieceStructure[j][i] == 1) {
+//                    rotatedPieceStructure[rotatedPieceStructure.length - i - 1][j] = 1;
+//                }
+//            }
+//        }
+        int h = pieceStructure.length;
+        int w = pieceStructure[0].length;
+        for (int col = 0; col < w; col++) {
+            for (int row = 0; row < h; row++) {
+                rotatedPieceStructure[col][h - row - 1] = pieceStructure[row][col]; // swap coordinates
             }
         }
         return rotatedPieceStructure;
     }
     
     private static void movePiece(int y, int x) {
-        boardHistory.add(deepCopyOfBoard(boardColors));
         pieceToMovePos = new Point(x, y);
         int[][] pieceStructure = pieceToMove.getStructure();
         // validating where the piece is placed; returning if piece would go out of bounds of the array

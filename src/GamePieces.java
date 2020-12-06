@@ -56,13 +56,20 @@ public enum GamePieces {
     {
         
         for (Map.Entry<int[][], GamePieces> e : lookup.entrySet()) {
-            if (Arrays.deepEquals(e.getKey(), struct)) {
+            boolean result = false;
+            int rotateDegree = 0;
+            int [][] structure = e.getKey();
+            while (!result && rotateDegree <= 360) {
+                result = Arrays.deepEquals(struct, structure);
+                structure = State.ccRotation(structure);
+                rotateDegree+=90;
+            }
+            if (result) {
                 return e.getValue().name();
             }
                 
         }
-
-        System.out.println("lol not working");
+        System.out.println("Returning null");
         return null;
     }
 
