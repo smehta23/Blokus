@@ -11,7 +11,7 @@ import javax.swing.*;
 public class PlayerPieceSet extends JComponent{
     
     private Player player;
-    public Color color;
+    private Color color;
     private Set<Piece> pieces;
 
     public PlayerPieceSet() {

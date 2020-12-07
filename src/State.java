@@ -15,13 +15,14 @@ public class State {
     public static final Color [] GAME_COLORS = {BLUE, GREEN, RED, YELLOW};
     
     private static LinkedList<Color[][]> boardHistory = new LinkedList<Color[][]>();
-    private static Player [] players = {new Player(), new Player(), new Player(), new Player()};
+    public static Player [] players = {new Player(), new Player(), new Player(), new Player()};
     private static Color[][] boardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
     public static Piece pieceToMove;
     public static Piece piecePrevMoved;
     public static Point pieceToMovePos;
     public static Player currentPlayer = players[0];
     public static int turnNumber = 0;
+    public static String gameStatus = "";
     
     public static Player getCurrentPlayer() {
         return new Player(
@@ -40,12 +41,93 @@ public class State {
     }
     
     private static void finishTurn() {
-        if (pieceToMove!=null) {
+        boolean pieceSuccessfullyMoved = validateTurn();
+        if (pieceToMove!=null && pieceSuccessfullyMoved) {
             currentPlayer.pieceMoved(pieceToMove); //remove the piece from the currentPlayer's set
         }
         boardHistory.add(deepCopyOfBoard(boardColors)); //save board state
         pieceToMove = null; //Reinitialize the pieceToMove to null
+        updateGameStatus();
+    }
+    
+    private static int findPlayer(Player player) {
+        for (int i = 0; i < players.length; i++) {
+            if (players[i].equals(player)) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    //looks at the next 4 players; if they all cannot make moves the game ends
+    private static void updateGameStatus() {
+        Player originalCurrentPlayer = State.getCurrentPlayer();
+        boolean player1CanMove = validateTurn();
+        if (player1CanMove) {
+            State.setBoardColors(boardHistory.getLast());
+            currentPlayer = originalCurrentPlayer;
+            return;
+        }
+        System.out.println("Player 1 cannot move.");
         
+        currentPlayer = players[(State.findPlayer(currentPlayer) + 1) % NUM_OF_PLAYERS];
+        boolean player2CanMove = validateTurn();
+        if (player2CanMove) {
+            State.setBoardColors(boardHistory.getLast());
+            currentPlayer = originalCurrentPlayer;
+            return;
+        }
+        System.out.println("Player 2 cannot move.");
+        
+        currentPlayer = players[(State.findPlayer(currentPlayer) + 1) % NUM_OF_PLAYERS];
+        boolean player3CanMove = validateTurn();
+        if (player3CanMove) {
+            State.setBoardColors(boardHistory.getLast());
+            currentPlayer = originalCurrentPlayer;
+            return;
+        }
+        System.out.println("Player 3 cannot move.");
+        
+        currentPlayer = players[(State.findPlayer(currentPlayer) + 1) % NUM_OF_PLAYERS];
+        boolean player4CanMove = validateTurn();
+        if (player4CanMove) {
+            State.setBoardColors(boardHistory.getLast());
+            currentPlayer = originalCurrentPlayer;
+            return;
+        }
+        System.out.println("Player 4 cannot move.");
+        gameStatus = "GAME OVER";
+    }
+    
+  //makes sure that a piece was placed on the board by the currentPlayer if it could be
+    private static boolean validateTurn() {
+        //if the player has more than 21-(1+turnNumber / NUM_OF_PLAYERS) this indicates
+        //that they didn't place a piece down
+        boolean pieceCanBeMoved = true;
+        //if (currentPlayer.getPiecesSize() > 21 - (1 + turnNumber / NUM_OF_PLAYERS)) {
+        if (deepEquals(boardColors, boardHistory.getLast())) {
+            System.out.println("Piece wasn't moved by player.");
+            pieceCanBeMoved = false;
+            //go through each piece; see if it can be placed at every position on the grid, 
+            //testing all 4 orientations 
+            for (Piece p: currentPlayer.getPieces()) {
+                for (int row = 0; row < BOARD_HEIGHT && !pieceCanBeMoved; row++) {
+                    for (int col = 0; col < BOARD_WIDTH && !pieceCanBeMoved; col++) {
+                        pieceToMove = new Piece(p.getStructure(), p.getColor());
+                        int rotateDegree = 0;
+                        while (!pieceCanBeMoved && rotateDegree <= 360) {
+                            //automatically places the piece that can be moved if possible
+                            pieceCanBeMoved = State.movePiece(row, col);
+                            if (pieceCanBeMoved) { break; }
+                            pieceToMove = new Piece (State.ccRotation(pieceToMove.getStructure()), pieceToMove.getColor());
+                            rotateDegree+=90;
+                        }
+                    }
+                }
+            }
+        }
+        
+        return pieceCanBeMoved;
+
     }
 
     public static void setBoardToDefault() {
@@ -54,10 +136,11 @@ public class State {
                 boardColors[i][j] = Color.GRAY;
             }
         }
+        boardHistory.add(State.getBoardColors());
     }
 
     public static Color[][] getBoardColors() {
-        return boardColors;
+        return deepCopyOfBoard(boardColors);
     }
 
     public static void setBoardColors(int row, int col, Color c) {
@@ -123,13 +206,15 @@ public class State {
         return rotatedPieceStructure;
     }
     
-    private static void movePiece(int y, int x) {
+    
+    
+    private static boolean movePiece(int y, int x) {
         pieceToMovePos = new Point(x, y);
         int[][] pieceStructure = pieceToMove.getStructure();
         // validating where the piece is placed; returning if piece would go out of bounds of the array
         if (pieceStructure.length + y - 1 >= BOARD_HEIGHT || pieceStructure[0].length + x - 1 >= BOARD_WIDTH) {
             System.out.println("Cannot place piece here: (" + y + ", " + x + ")");
-            return;
+            return false;
         }
         
         //validating first move being at one of the board's corners
@@ -148,7 +233,7 @@ public class State {
         }
         if (!boardCornerTouch && currentPlayer.getPiecesSize() == 21) {
             System.out.println("The piece must be placed adjacent to a board corner.");
-            return;
+            return false;
         }
         
         
@@ -171,28 +256,29 @@ public class State {
         }
         if (!cornerSameColorTouch && currentPlayer.getPiecesSize() < 21) {
             System.out.println("Piece not touching corner of another piece with the same color.");
-            return;
+            return false;
         }
         
         //validating using Blokus rules--no edge touch
+        boolean edgeDifferentColorTouch = true;
         for (int i = y; i < y + pieceStructure.length; i++) {
             for (int j = x; j < x + pieceStructure[0].length; j++) {
                 if (pieceStructure[i - y][j - x] == 1) {
                     if (validateIndex (i-1, j) && boardColors[i-1][j].equals(pieceToMove.getColor())) {
-                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
-                        return;
+                        edgeDifferentColorTouch = false;
                     } else if (validateIndex (i+1, j) && boardColors[i+1][j].equals(pieceToMove.getColor())) {
-                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
-                        return;
+                        edgeDifferentColorTouch = false;
                     } else if (validateIndex (i, j-1) && boardColors[i][j-1].equals(pieceToMove.getColor())) {
-                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
-                        return;
+                        edgeDifferentColorTouch = false;
                     } else if (validateIndex (i, j+1) && boardColors[i][j+1].equals(pieceToMove.getColor())) {
-                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
-                        return;
+                        edgeDifferentColorTouch = false;
                     }
                 }
             }
+        }
+        if (!edgeDifferentColorTouch) {
+            System.out.println("Cannot move here. Would touch edge of same-colored piece.");
+            return false;
         }
         
         
@@ -201,7 +287,7 @@ public class State {
             for (int j = x; j < x + pieceStructure[0].length; j++) {
                 if (pieceStructure[i - y][j - x] == 1 && !boardColors[i][j].equals(Color.GRAY)) {
                     System.out.println("Another piece is already here.");
-                    return;
+                    return false;
                 }
             }
         }
@@ -216,6 +302,8 @@ public class State {
                 }
             }
         }
+        
+        return true;
     }
     
     
@@ -231,6 +319,16 @@ public class State {
         return clonedBoardColors;
     }
     
+    private static boolean deepEquals(Color [][] board1, Color[][] board2) {
+        for (int i = 0; i < BOARD_HEIGHT; i++) {
+            for (int j = 0; j < BOARD_WIDTH; j++) {
+                if (!board1[i][j].equals(board2[i][j])) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
     
     private static boolean validateIndex(int row, int col) {
         return row >= 0 && row < boardColors.length && col >= 0 && col<boardColors[0].length;

@@ -47,6 +47,18 @@ public class Piece extends JPanel{
         return Arrays.copyOf(pieceStructure, pieceStructure.length);
     }
     
+    public int getNumOfSquares() {
+        int count = 0;
+        for (int i = 0; i < pieceStructure.length; i++) {
+            for (int j = 0; j < pieceStructure[i].length; j++) {
+                if (pieceStructure[i][j] == 1) {
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    
     public Color getColor() {
         return new Color(this.c.getRGB());
     }

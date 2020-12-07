@@ -9,6 +9,7 @@ public class Player{
     private String name;
     private Color color;
     private int number;
+    private int score = 0;
     
     
     public Player() {
@@ -21,6 +22,9 @@ public class Player{
         for (GamePieces piece : gamePieces) {
             Piece p = new Piece(piece.getStructure(), color);
             this.pieces.add(p);
+        }
+        for (Piece p: pieces) {
+            score+=p.getNumOfSquares();
         }
 
         playerNumber++;
@@ -49,6 +53,8 @@ public class Player{
 //        }
     }
     
+
+    
     public String getName() {
         return name;
     }
@@ -59,6 +65,14 @@ public class Player{
     
     public int getNumber() {
         return number;
+    }
+    
+    public int getScore() {
+        score = 0;
+        for (Piece p: pieces) {
+            score+=p.getNumOfSquares();
+        }
+        return score;
     }
     
     public Set<Piece> getPieces(){
