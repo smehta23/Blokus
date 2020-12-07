@@ -58,44 +58,28 @@ public class State {
         }
         return -1;
     }
-    //looks at the next 4 players; if they all cannot make moves the game ends
+    //looks at the next 4 players; if they all cannot make moves the game ends and winner is determined
     private static void updateGameStatus() {
         Player originalCurrentPlayer = State.getCurrentPlayer();
-        boolean player1CanMove = validateTurn();
-        if (player1CanMove) {
-            State.setBoardColors(boardHistory.getLast());
-            currentPlayer = originalCurrentPlayer;
-            return;
+        boolean playerCanMove = false;
+        for (int i = 0; i < 4 && !playerCanMove; i++) {
+            playerCanMove = validateTurn();
+            if (playerCanMove) {
+                State.setBoardColors(boardHistory.getLast());
+                currentPlayer = originalCurrentPlayer;
+                return;
+            }
+            System.out.println("Player " + (i + 1)  + " cannot move");
+            currentPlayer = players[(State.findPlayer(currentPlayer) + 1) % NUM_OF_PLAYERS];        
         }
-        System.out.println("Player 1 cannot move.");
         
-        currentPlayer = players[(State.findPlayer(currentPlayer) + 1) % NUM_OF_PLAYERS];
-        boolean player2CanMove = validateTurn();
-        if (player2CanMove) {
-            State.setBoardColors(boardHistory.getLast());
-            currentPlayer = originalCurrentPlayer;
-            return;
+        Player lowestScorePlayer = players[0];
+        for (int i = 1; i < players.length; i++) {
+            if (players[i].getScore() < lowestScorePlayer.getScore()) {
+                lowestScorePlayer = players[i];
+            }
         }
-        System.out.println("Player 2 cannot move.");
-        
-        currentPlayer = players[(State.findPlayer(currentPlayer) + 1) % NUM_OF_PLAYERS];
-        boolean player3CanMove = validateTurn();
-        if (player3CanMove) {
-            State.setBoardColors(boardHistory.getLast());
-            currentPlayer = originalCurrentPlayer;
-            return;
-        }
-        System.out.println("Player 3 cannot move.");
-        
-        currentPlayer = players[(State.findPlayer(currentPlayer) + 1) % NUM_OF_PLAYERS];
-        boolean player4CanMove = validateTurn();
-        if (player4CanMove) {
-            State.setBoardColors(boardHistory.getLast());
-            currentPlayer = originalCurrentPlayer;
-            return;
-        }
-        System.out.println("Player 4 cannot move.");
-        gameStatus = "GAME OVER";
+        gameStatus = "GAME OVER: " + lowestScorePlayer.getName() + " wins!";
     }
     
   //makes sure that a piece was placed on the board by the currentPlayer if it could be

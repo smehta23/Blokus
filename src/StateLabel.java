@@ -54,7 +54,6 @@ public class StateLabel extends JComponent {
     
     @Override
     public void paintComponent(Graphics gc) {
-
         turnNumberLabel.setText("Turn Number: " + State.turnNumber);
         pieceSetSizeLabel.setText("Player Piece Set Size: " + State.currentPlayer.getPieces().size());
         playerNameLabel.setText("Current Player: " + State.getCurrentPlayer().getName());
