@@ -74,6 +74,8 @@ public class Board extends JComponent {
         
     }
     
-    
+    public Dimension getPreferredSize() {
+        return new Dimension(BOARD_HEIGHT * Square.SQUARE_LENGTH, BOARD_WIDTH * Square.SQUARE_LENGTH);
+    }
 
 }

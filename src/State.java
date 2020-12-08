@@ -93,7 +93,7 @@ public class State {
             pieceCanBeMoved = false;
             //go through each piece; see if it can be placed at every position on the grid, 
             //testing all 4 orientations 
-            for (Piece p: currentPlayer.getPieces()) {
+            for (Piece p: currentPlayer.getPiecesReverse()) {
                 for (int row = 0; row < BOARD_HEIGHT && !pieceCanBeMoved; row++) {
                     for (int col = 0; col < BOARD_WIDTH && !pieceCanBeMoved; col++) {
                         pieceToMove = new Piece(p.getStructure(), p.getColor());

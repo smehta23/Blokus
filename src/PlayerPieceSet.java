@@ -61,5 +61,9 @@ public class PlayerPieceSet extends JComponent{
             //repaint();
         }
     }
+    
+//    public Dimension getPreferredSize() {
+//        return new Dimension(1000, 50);
+//    }
 
 }

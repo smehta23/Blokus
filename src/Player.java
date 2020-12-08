@@ -1,5 +1,8 @@
 import java.awt.Color;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 public class Player{
@@ -77,6 +80,12 @@ public class Player{
     
     public Set<Piece> getPieces(){
         Set<Piece> copyOfPieces = new HashSet<Piece>(this.pieces); 
+        return copyOfPieces;
+    }
+    
+    public List<Piece> getPiecesReverse(){
+        List<Piece> copyOfPieces = new LinkedList<Piece>(this.pieces); 
+        Collections.reverse(copyOfPieces);
         return copyOfPieces;
     }
     

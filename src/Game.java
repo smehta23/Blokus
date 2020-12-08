@@ -16,6 +16,11 @@ public class Game implements Runnable {
         JPanel panel = new JPanel();
         frame.getContentPane().add(panel);
         
+        JMenuBar menuBar = new JMenuBar();
+        frame.setJMenuBar(menuBar);
+        menuBar.add(new JMenu("File"));
+        
+        
         StateLabel stateLabel = new StateLabel();
         panel.add(stateLabel);
         
