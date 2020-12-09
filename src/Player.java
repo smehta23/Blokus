@@ -89,6 +89,10 @@ public class Player{
         return copyOfPieces;
     }
     
+    public void setPieces(Set<Piece> pieceSet) {
+        this.pieces = new HashSet<Piece>(pieceSet);
+    }
+    
     public int getPiecesSize() {
         return pieces.size();
     }

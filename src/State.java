@@ -24,8 +24,27 @@ public class State {
     public static int turnNumber = 0;
     public static String gameStatus = "";
     
+    public static int getTurnNumber() {
+        return turnNumber;
+    }
+    
+    public static void setTurnNumber(int n) {
+        turnNumber = n;
+    }
     public static Player getCurrentPlayer() {
         return copyPlayer(currentPlayer);
+    }
+    
+    public static void setCurrentPlayer(Player p) {
+        currentPlayer = copyPlayer(p);
+    }
+    
+    public static Player getPlayer(int num) {
+        return copyPlayer(players[num]);
+    }
+    
+    public static void setPlayer (Player p, int num) {
+        players[num] = copyPlayer(p);
     }
     
     public static Player[] getAllPlayers() {
