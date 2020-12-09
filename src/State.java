@@ -25,11 +25,23 @@ public class State {
     public static String gameStatus = "";
     
     public static Player getCurrentPlayer() {
+        return copyPlayer(currentPlayer);
+    }
+    
+    public static Player[] getAllPlayers() {
+        Player[] copyOfPlayers = new Player[NUM_OF_PLAYERS];
+        for (int i = 0; i < players.length; i++) {
+            copyOfPlayers[i] = copyPlayer(players[i]);
+        }
+        return copyOfPlayers;
+    }
+    
+    private static Player copyPlayer(Player p) {
         return new Player(
-                currentPlayer.getPieces(),
-                currentPlayer.getName(),
-                currentPlayer.getColor(),
-                currentPlayer.getNumber()
+                p.getPieces(),
+                p.getName(),
+                p.getColor(),
+                p.getNumber()
             );
     }
     
@@ -200,22 +212,28 @@ public class State {
             System.out.println("Cannot place piece here: (" + y + ", " + x + ")");
             return false;
         }
-        
         //validating first move being at one of the board's corners
+        int a, b;
+        a = b = 0;
         boolean boardCornerTouch = false;
-        for (int i = y; i < y + pieceStructure.length; i++) {
-            for (int j = x; j < x + pieceStructure[0].length; j++) {
+        for (int i = y; i < y + pieceStructure.length && !boardCornerTouch; i++) {
+            for (int j = x; j < x + pieceStructure[0].length && !boardCornerTouch; j++) {
                 if (pieceStructure[i - y][j - x] == 1) {
                     if ((i == 0 && j == 0) || 
                             (i == BOARD_HEIGHT-1 && j == 0) || 
                             (i == 0 && j == BOARD_WIDTH-1 ) ||
                             (i == BOARD_HEIGHT-1 && j == BOARD_WIDTH-1)) {
+                        
                         boardCornerTouch = true;
+                        break;
                     }
                 }
+                b = j;
             }
+            a = i; 
         }
         if (!boardCornerTouch && currentPlayer.getPiecesSize() == 21) {
+            //System.out.println(a + " " + b);
             System.out.println("The piece must be placed adjacent to a board corner.");
             return false;
         }

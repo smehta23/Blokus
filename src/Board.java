@@ -46,9 +46,10 @@ public class Board extends JComponent {
         public void mouseDragged(MouseEvent e) {
             System.out.println("Board mouse drag registered.");
             Point pos = e.getPoint();
-            //+1 because each square has an adjacent 1 px border
-            int x = pos.x/(Square.getDefaultSize() + 1);
-            int y = pos.y/(Square.getDefaultSize() + 1);
+            int x = pos.x/(Square.getDefaultSize());
+            int y = pos.y/(Square.getDefaultSize());
+
+            System.out.println(pos.x + " " + pos.y + " -> Point (" + y + ", " + x + ")");
             if (x < BOARD_WIDTH && y < BOARD_HEIGHT && x >= 0 && y >= 0) {
                 State.moveLastPlacedPiece(y, x);
                 repaint();
@@ -62,10 +63,10 @@ public class Board extends JComponent {
         public void mouseClicked(MouseEvent e) {
             System.out.println("Board mouse click registered.");
             Point pos = e.getPoint();
-            //+1 because each square has an adjacent 1 px border
-            int x = pos.x/(Square.getDefaultSize() + 1);
-            int y = pos.y/(Square.getDefaultSize() + 1);
-            
+            int x = pos.x/(Square.getDefaultSize());
+            int y = pos.y/(Square.getDefaultSize());
+
+            System.out.println(pos.x + " " + pos.y + " -> Point (" + y + ", " + x + ")");
             if (x < BOARD_WIDTH && y < BOARD_HEIGHT && x >= 0 && y >= 0) {
                 State.placePieceOnBoard(y, x);
                 repaint();
