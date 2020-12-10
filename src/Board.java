@@ -74,5 +74,19 @@ public class Board extends JComponent {
     public Dimension getPreferredSize() {
         return new Dimension(BOARD_HEIGHT * Square.SQUARE_LENGTH, BOARD_WIDTH * Square.SQUARE_LENGTH);
     }
+    
+    public Dimension getSize() {
+        return new Dimension(BOARD_HEIGHT * Square.SQUARE_LENGTH, BOARD_WIDTH * Square.SQUARE_LENGTH);
+    }
+    
+    public int getWidth() {
+        return BOARD_WIDTH * Square.SQUARE_LENGTH;
+    }
+    
+    public int getHeight() {
+        return BOARD_WIDTH * Square.SQUARE_LENGTH;
+    }
+    
+    
 
 }
