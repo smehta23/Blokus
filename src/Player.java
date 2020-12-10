@@ -93,6 +93,10 @@ public class Player{
         this.pieces = new HashSet<Piece>(pieceSet);
     }
     
+    public void addPiece(Piece p) {
+        this.pieces.add(p);
+    }
+    
     public int getPiecesSize() {
         return pieces.size();
     }

@@ -55,7 +55,7 @@ public class OpenGame implements ActionListener {
                 pset.repaint();
                 
 
-                State.updateGameStatus();
+                //State.updateGameStatus();
                 stateLabel.repaint();
                 
                 

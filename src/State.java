@@ -43,14 +43,15 @@ public class State {
             Piece prevPiecePlaced = pieceHistory.getLast();
             System.out.println(prevPiecePlaced.getName());
             Player prevPlayer = State.getPlayer(prevPiecePlaced.getColor());
-            Set<Piece> updatedPieces = prevPlayer.getPieces();
-            updatedPieces.add(prevPiecePlaced);
-            prevPlayer.setPieces(updatedPieces);
+            prevPlayer.addPiece(prevPiecePlaced);
+//            updatedPieces.add(prevPiecePlaced);
+//            prevPlayer.setPieces(updatedPieces);
             int index = getPlayerNum(prevPlayer);
             players[index] = prevPlayer;
             pieceHistory.removeLast();
             currentPlayer = prevPlayer;
             boardHistory.add(deepCopyOfBoard(getBoardColors()));
+            //updateGameStatus();
             
             turnNumber--;
         }
@@ -169,8 +170,8 @@ public class State {
         boolean pieceSuccessfullyMoved = validateTurn();
         if (pieceToMove != null && pieceSuccessfullyMoved) {
             currentPlayer.pieceMoved(pieceToMove); // remove the piece from the currentPlayer's set
-            pieceHistory.add(pieceToMove);
         }
+        pieceHistory.add(pieceToMove);
         boardHistory.add(deepCopyOfBoard(boardColors)); // save board state
         updateGameStatus();
         pieceToMove = null; // Reinitialize the pieceToMove to null
@@ -220,6 +221,10 @@ public class State {
      *         currentPlayer did not make a move before clicking "Next Turn"
      */
     private static boolean validateTurn() {
+        State.setBoardColors(boardHistory.getLast()); //returning to the board before preview
+        if (pieceToMove!=null) { //player could have opted to not choose a piece at all
+            movePiece(pieceToMovePos.y, pieceToMovePos.x);
+        }
         boolean pieceCanBeMoved = true;
         if (boardsDeepEquals(boardColors, boardHistory.getLast())) {
             System.out.println("Piece wasn't moved by player.");
@@ -285,12 +290,13 @@ public class State {
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      */
     public static void moveLastPlacedPiece(int y, int x) {
+        pieceToMovePos = new Point(x, y);
         if (boardHistory.size() < 1) {
             return;
         }
         Color[][] prev = boardHistory.getLast();
         State.setBoardColors(prev);
-        State.movePiece(y, x);
+        State.previewPiece(y, x);
     }
 
     /**
@@ -322,13 +328,26 @@ public class State {
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      */
     public static void placePieceOnBoard(int y, int x) {
+        pieceToMovePos = new Point(x, y);
         if (piecePrevMoved == null || !piecePrevMoved.getColor().equals(pieceToMove.getColor())) {
             // System.out.println(piecePrevMoved);
             piecePrevMoved = Piece.copy(pieceToMove);
             // boardHistory.add(deepCopyOfBoard(boardColors));
-            State.movePiece(y, x);
+            State.previewPiece(y, x);
         } else {
             State.moveLastPlacedPiece(y, x);
+        }
+    }
+    
+    public static void previewPiece(int y, int x) {
+        int[][] pieceStructure = pieceToMove.getStructure();
+        for (int i = y; i < y + pieceStructure.length; i++) {
+            for (int j = x; j < x + pieceStructure[0].length; j++) {
+                // coloring in board if index of 2D (rectangular) array representing piece is 1
+                if (pieceStructure[i - y][j - x] == 1) {
+                    State.setBoardColors(i, j, currentPlayer.getColor().darker());
+                }
+            }
         }
     }
 
