@@ -131,6 +131,29 @@ public class Piece extends JPanel{
         return name + " " + c.toString();
     }
     
+    
+    
+    public static int[][] rotatedCC(int[][] pieceStructure) {
+        int[][] rotatedPieceStructure = new int[pieceStructure[0].length][pieceStructure.length];
+        for (int i = 0; i < rotatedPieceStructure.length; i++) {
+            for (int j = 0; j < rotatedPieceStructure[i].length; j++) {
+                if (pieceStructure[j][i] == 1) {
+                    rotatedPieceStructure[rotatedPieceStructure.length - i - 1][j] = 1;
+                }
+            }
+        }
+        return rotatedPieceStructure;
+    }
+    
+    public static Piece rotatedCC(Piece p) {
+        int [][] rotatedPieceStructure = rotatedCC(p.getStructure());
+        return new Piece(rotatedPieceStructure, p.getColor());
+    }
+    
+    
+    public static Piece copy(Piece p) {
+        return new Piece(p.getStructure(), p.getColor());
+    }
 
     
     

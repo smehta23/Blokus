@@ -53,7 +53,11 @@ public class OpenGame implements ActionListener {
                 
                 board.repaint();
                 pset.repaint();
+                
+
+                State.updateGameStatus();
                 stateLabel.repaint();
+                
                 
                 reader.close();
             } catch (FileNotFoundException e1) {
@@ -67,6 +71,7 @@ public class OpenGame implements ActionListener {
 
     }
 
+    //to ascertain that file was not edited so that >4 colors are on the board
     private void checkForModifications() {
         // TODO Auto-generated method stub
 
@@ -74,15 +79,17 @@ public class OpenGame implements ActionListener {
 
     private void loadBoard() {
         try {
+            Color[][] boardColors = new Color[State.BOARD_HEIGHT][State.BOARD_WIDTH];
             for (int i = 0; i < State.BOARD_HEIGHT; i++) {
                 for (int j = 0; j < State.BOARD_WIDTH; j++) {
                     String s = readExactly(reader, 32);
                     // int x = reader.read();
                     int RGB = (int) Long.parseLong(s, 2);
-                    State.setBoardColors(i, j, new Color(RGB));
+                    boardColors[i][j] = new Color(RGB);
                     System.out.println(RGB);
                 }
             }
+            State.setBoardColors(boardColors);
         } catch (IOException e) {
             System.out.println("Error creating board/reading from file.");
         }
@@ -104,13 +111,15 @@ public class OpenGame implements ActionListener {
 //                    System.out.print(pieceName + ": ");
 //                    System.out.println(GamePieces.valueOf(pieceName));
                     pieces.add(new Piece (GamePieces.valueOf(pieceName).getStructure(), 
-                                    State.players[playerNum].getColor()));
+                                    State.getPlayer(playerNum).getColor()));
                     
 //                    updatedPlayer = State.getPlayer(playerNum);
 //                    updatedPlayer.pieceMoved(GamePieces.valueOf(pieceName).getStructure());
                     
                 }
-                State.players[playerNum].setPieces(pieces);
+                updatedPlayer = State.getPlayer(playerNum);
+                updatedPlayer.setPieces(pieces);
+                State.setPlayer(updatedPlayer, playerNum);
                 System.out.println(pieces.size());
 
             }

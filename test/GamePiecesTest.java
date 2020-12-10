@@ -30,7 +30,7 @@ public class GamePiecesTest {
     
     @Test
     public void rotateTestT4() {
-        int[][] struct = State.ccRotation(GamePieces.T4.getStructure());
+        int[][] struct = Piece.rotatedCC(GamePieces.T4.getStructure());
         
         assertEquals(GamePieces.getName(struct), "T4");
     }

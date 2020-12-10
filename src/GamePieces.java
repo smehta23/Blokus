@@ -61,7 +61,7 @@ public enum GamePieces {
             int [][] structure = e.getKey();
             while (!result && rotateDegree <= 360) {
                 result = Arrays.deepEquals(struct, structure);
-                structure = State.ccRotation(structure);
+                structure = Piece.rotatedCC(structure);
                 rotateDegree+=90;
             }
             if (result) {

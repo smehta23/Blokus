@@ -18,7 +18,6 @@ public class StateLabel extends JComponent {
     private JLabel playerNameLabel;
     private JLabel pieceSetSizeLabel;
     private JLabel turnNumberLabel;
-    private JLabel pieceSelectedLabel;
     private JLabel gameStatusLabel;
     
     private JLabel player1ScoreLabel;
@@ -48,27 +47,27 @@ public class StateLabel extends JComponent {
         PlayerInfo playerInfo = new PlayerInfo();
         GameInfo gameInfo = new GameInfo();
         
-        player1ScoreLabel = new JLabel(State.players[0].getName() + " Score: " + State.players[0].getScore());
+        player1ScoreLabel = new JLabel(State.getPlayer(0).getName() + " Score: " + State.getPlayer(0).getScore());
         playerInfo.add(player1ScoreLabel);
-        player1ScoreLabel.setForeground(State.players[0].getColor().darker());
-        player2ScoreLabel = new JLabel(State.players[1].getName() + " Score: " + State.players[1].getScore());
+        player1ScoreLabel.setForeground(State.getPlayer(0).getColor().darker());
+        player2ScoreLabel = new JLabel(State.getPlayer(1).getName() + " Score: " + State.getPlayer(1).getScore());
         playerInfo.add(player2ScoreLabel);
-        player2ScoreLabel.setForeground(State.players[1].getColor().darker());
-        player3ScoreLabel = new JLabel(State.players[2].getName() + " Score: " + State.players[2].getScore());
+        player2ScoreLabel.setForeground(State.getPlayer(1).getColor().darker());
+        player3ScoreLabel = new JLabel(State.getPlayer(2).getName() + " Score: " + State.getPlayer(2).getScore());
         playerInfo.add(player3ScoreLabel);
-        player3ScoreLabel.setForeground(State.players[2].getColor().darker());
-        player4ScoreLabel = new JLabel(State.players[3].getName() + " Score: " + State.players[3].getScore());
+        player3ScoreLabel.setForeground(State.getPlayer(2).getColor().darker());
+        player4ScoreLabel = new JLabel(State.getPlayer(3).getName() + " Score: " + State.getPlayer(3).getScore());
         playerInfo.add(player4ScoreLabel);
-        player4ScoreLabel.setForeground(State.players[3].getColor().darker());
+        player4ScoreLabel.setForeground(State.getPlayer(3).getColor().darker());
         playerNameLabel = new JLabel("Current Player: " + State.getCurrentPlayer().getName());
         
         
         gameInfo.add(playerNameLabel);
-        turnNumberLabel = new JLabel("Turn Number: " + State.turnNumber+"");
+        turnNumberLabel = new JLabel("Turn Number: " + State.getTurnNumber());
         gameInfo.add(turnNumberLabel);
-        pieceSetSizeLabel = new JLabel("Player Piece Set Size: " + State.currentPlayer.getPiecesSize() + "");
+        pieceSetSizeLabel = new JLabel("Player Piece Set Size: " + State.getCurrentPlayer().getPiecesSize() + "");
         gameInfo.add(pieceSetSizeLabel);
-        gameStatusLabel = new JLabel(State.gameStatus);
+        gameStatusLabel = new JLabel(State.getStatus());
         gameInfo.add(gameStatusLabel);
         
         
@@ -89,20 +88,15 @@ public class StateLabel extends JComponent {
     
     @Override
     public void paintComponent(Graphics gc) {
-        turnNumberLabel.setText("Turn Number: " + State.turnNumber);
-        pieceSetSizeLabel.setText("Player Piece Set Size: " + State.currentPlayer.getPieces().size());
+        turnNumberLabel.setText("Turn Number: " + State.getTurnNumber());
+        pieceSetSizeLabel.setText("Player Piece Set Size: " + State.getCurrentPlayer().getPieces().size());
         playerNameLabel.setText("Current Player: " + State.getCurrentPlayer().getName());
-        player1ScoreLabel.setText(State.players[0].getName() + " Score: " + State.players[0].getScore());
-        player2ScoreLabel.setText(State.players[1].getName() + " Score: " + State.players[1].getScore());
-        player3ScoreLabel.setText(State.players[2].getName() + " Score: " + State.players[2].getScore());
-        player4ScoreLabel.setText(State.players[3].getName() + " Score: " + State.players[3].getScore());
-        gameStatusLabel.setText("<html>" + "<B>" + State.gameStatus + "</B>" + "</html>");
+        player1ScoreLabel.setText(State.getPlayer(0).getName() + " Score: " + State.getPlayer(0).getScore());
+        player2ScoreLabel.setText(State.getPlayer(1).getName() + " Score: " + State.getPlayer(1).getScore());
+        player3ScoreLabel.setText(State.getPlayer(2).getName() + " Score: " + State.getPlayer(2).getScore());
+        player4ScoreLabel.setText(State.getPlayer(3).getName() + " Score: " + State.getPlayer(3).getScore());
+        gameStatusLabel.setText("<html>" + "<B>" + State.getStatus() + "</B>" + "</html>");
         gameStatusLabel.setFont(new Font("Serif", Font.PLAIN, 20));
-        //        if (State.pieceToMove!=null) {
-//            pieceSelectedLabel.setText("Piece Selected is " + State.pieceToMove.getName());
-//        } else {
-//            pieceSelectedLabel.setText("Piece Selected: null");
-//        }
 
     }
     

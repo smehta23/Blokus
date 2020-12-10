@@ -54,6 +54,18 @@ public class Game implements Runnable {
         });
         panel.add(nextTurn);
         
+        JButton undo = new JButton("Undo Move");
+        undo.addActionListener( new ActionListener() {
+            public void actionPerformed (ActionEvent e) {
+                State.undo();
+                board.repaint();
+                pset.repaint();
+                stateLabel.repaint();
+                
+            }
+        });
+        panel.add(undo);
+        
 
         JMenuBar menuBar = new JMenuBar();
         JMenu fileMenu = new JMenu("File");
