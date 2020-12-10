@@ -7,7 +7,7 @@ import javax.swing.*;
 @SuppressWarnings("serial")
 public class Square extends JLabel {
     
-    public static final int SQUARE_LENGTH = 30;
+    public static final int SQUARE_LENGTH = 25;
     private Color c;
     private Dimension d;
     
@@ -23,7 +23,7 @@ public class Square extends JLabel {
     
     public Square(Color c) {
         this.c = c;
-        d = new Dimension (30, 30);
+        d = new Dimension (SQUARE_LENGTH, SQUARE_LENGTH);
     }
     
     public Square(Color c, Dimension d) {
@@ -43,7 +43,7 @@ public class Square extends JLabel {
     }
     
     public static int getDefaultSize() {
-        return 30;
+        return SQUARE_LENGTH;
     }
     
     public void setColor(Color c) {
