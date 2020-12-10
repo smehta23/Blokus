@@ -48,8 +48,6 @@ public class Board extends JComponent {
             Point pos = e.getPoint();
             int x = pos.x/(Square.getDefaultSize());
             int y = pos.y/(Square.getDefaultSize());
-
-            System.out.println(pos.x + " " + pos.y + " -> Point (" + y + ", " + x + ")");
             if (x < BOARD_WIDTH && y < BOARD_HEIGHT && x >= 0 && y >= 0) {
                 State.moveLastPlacedPiece(y, x);
                 repaint();
@@ -65,8 +63,6 @@ public class Board extends JComponent {
             Point pos = e.getPoint();
             int x = pos.x/(Square.getDefaultSize());
             int y = pos.y/(Square.getDefaultSize());
-
-            System.out.println(pos.x + " " + pos.y + " -> Point (" + y + ", " + x + ")");
             if (x < BOARD_WIDTH && y < BOARD_HEIGHT && x >= 0 && y >= 0) {
                 State.placePieceOnBoard(y, x);
                 repaint();

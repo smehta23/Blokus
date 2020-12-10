@@ -1,7 +1,8 @@
 import java.awt.Color;
 import java.awt.Point;
+import java.util.HashSet;
 import java.util.LinkedList;
-
+import java.util.Set;
 
 public class State {
 
@@ -16,6 +17,7 @@ public class State {
     public static final Color[] GAME_COLORS = { BLUE, GREEN, RED, YELLOW };
 
     private static LinkedList<Color[][]> boardHistory = new LinkedList<Color[][]>();
+    private static LinkedList<Piece> pieceHistory = new LinkedList<Piece>();
     private static Player[] players = { new Player(), new Player(), new Player(), new Player() };
     private static Color[][] boardColors = new Color[BOARD_HEIGHT][BOARD_WIDTH];
     private static Piece pieceToMove;
@@ -24,14 +26,35 @@ public class State {
     private static Player currentPlayer = players[0];
     private static int turnNumber = 0;
     private static String gameStatus = "";
-    
-    public static void undo() {
-        State.setBoardColors(deepCopyOfBoard(boardHistory.getLast()));
-        printBoard(boardHistory.getLast());
-        boardHistory.removeLast();
-        turnNumber--;
-    }
+    private static boolean turn_finish = true;
 
+    public static void undo() {
+        if (boardHistory.size() > 1) {
+//            if (turn_finish == true) {
+//                boardHistory.removeLast();
+//                turn_finish = false;
+//            }
+            boardHistory.removeLast();
+            //boardHistory.removeLast();
+            State.setBoardColors(deepCopyOfBoard(boardHistory.getLast()));
+            printBoard(boardHistory.getLast());
+            boardHistory.removeLast();
+            
+            Piece prevPiecePlaced = pieceHistory.getLast();
+            System.out.println(prevPiecePlaced.getName());
+            Player prevPlayer = State.getPlayer(prevPiecePlaced.getColor());
+            Set<Piece> updatedPieces = prevPlayer.getPieces();
+            updatedPieces.add(prevPiecePlaced);
+            prevPlayer.setPieces(updatedPieces);
+            int index = getPlayerNum(prevPlayer);
+            players[index] = prevPlayer;
+            pieceHistory.removeLast();
+            currentPlayer = prevPlayer;
+            boardHistory.add(deepCopyOfBoard(getBoardColors()));
+            
+            turnNumber--;
+        }
+    }
 
     /*
      * mutators/accessors for player-related variables
@@ -47,11 +70,20 @@ public class State {
     public static Player getPlayer(int num) {
         return copyPlayer(players[num]);
     }
+    
+    public static Player getPlayer(Color c) {
+        for (int i = 0; i < players.length; i++) {
+            if (players[i].getColor().equals(c)) {
+                return copyPlayer(players[i]); 
+            }
+        }
+        return null;
+    }
 
     public static void setPlayer(Player p, int num) {
         players[num] = copyPlayer(p);
     }
-    
+
     private static int getPlayerNum(Player player) {
         for (int i = 0; i < players.length; i++) {
             if (players[i].equals(player)) {
@@ -93,7 +125,7 @@ public class State {
     public static void setBoardColors(Color[][] bc) {
         boardColors = deepCopyOfBoard(bc);
     }
-    
+
     /*
      * get the game status
      */
@@ -111,14 +143,14 @@ public class State {
     public static void setTurnNumber(int n) {
         turnNumber = n;
     }
-    
+
     // ==========================================================================
     // Next turn operations
     // ==========================================================================
 
     /**
-     * Increments the turnNumber and sets the currentPlayer
-     * to the next player that occurs in the array of Players.
+     * Increments the turnNumber and sets the currentPlayer to the next player that
+     * occurs in the array of Players.
      */
     public static void nextTurn() {
         finishTurn();
@@ -128,32 +160,30 @@ public class State {
     }
 
     /**
-     * Removes the piece moved (manually or automatically) from 
-     * currentPlayer's set of pieces. Saves the state of the board to
-     * the boardHistory LinkedList, and updates the game's status by 
-     * calling updateGameStatus() to see if the game is complete.
-     * Resets the pieceToMove to null.
+     * Removes the piece moved (manually or automatically) from currentPlayer's set
+     * of pieces. Saves the state of the board to the boardHistory LinkedList, and
+     * updates the game's status by calling updateGameStatus() to see if the game is
+     * complete. Resets the pieceToMove to null.
      */
     private static void finishTurn() {
         boolean pieceSuccessfullyMoved = validateTurn();
         if (pieceToMove != null && pieceSuccessfullyMoved) {
             currentPlayer.pieceMoved(pieceToMove); // remove the piece from the currentPlayer's set
+            pieceHistory.add(pieceToMove);
         }
         boardHistory.add(deepCopyOfBoard(boardColors)); // save board state
         updateGameStatus();
         pieceToMove = null; // Reinitialize the pieceToMove to null
+        turn_finish = true;
     }
 
-
-
-
     /*
-     * The pieces of the next 4 players (including the current) are inspected; 
-     * if none of the 4 players can make any moves, the game ends and the 
-     * winner is determined and the gameStatus string is updated. 
+     * The pieces of the next 4 players (including the current) are inspected; if
+     * none of the 4 players can make any moves, the game ends and the winner is
+     * determined and the gameStatus string is updated.
      */
     public static void updateGameStatus() {
-        // boardHistory.add(deepCopyOfBoard(boardColors));
+        //boardHistory.add(deepCopyOfBoard(boardColors));
         gameStatus = "";
         Player originalCurrentPlayer = State.getCurrentPlayer();
         boolean playerCanMove = false;
@@ -177,24 +207,21 @@ public class State {
         gameStatus = "GAME OVER: " + lowestScorePlayer.getName() + " wins!";
     }
 
-
-
     /**
-     * Makes sure that a piece was placed on the board when the user requests
-     * the next turn to be staged by determining whether the previous state of the 
-     * board is the same as the current. If a piece was not placed, then 
-     * each of the pieces of currentPlayer is tested to see if it can 
-     * be placed on the board. Every square on the board is tested and all 
-     * 4 orientations of each piece are also tested. If the algorithm finds 
-     * that a piece can be placed on the board, it automatically places it before
-     * the next player's turn.
+     * Makes sure that a piece was placed on the board when the user requests the
+     * next turn to be staged by determining whether the previous state of the board
+     * is the same as the current. If a piece was not placed, then each of the
+     * pieces of currentPlayer is tested to see if it can be placed on the board.
+     * Every square on the board is tested and all 4 orientations of each piece are
+     * also tested. If the algorithm finds that a piece can be placed on the board,
+     * it automatically places it before the next player's turn.
      * 
-     * @return whether or not the currentPlayer is able to move a piece
-     * if the currentPlayer did not make a move before clicking "Next Turn" 
+     * @return whether or not the currentPlayer is able to move a piece if the
+     *         currentPlayer did not make a move before clicking "Next Turn"
      */
     private static boolean validateTurn() {
         boolean pieceCanBeMoved = true;
-        if (deepEquals(boardColors, boardHistory.getLast())) {
+        if (boardsDeepEquals(boardColors, boardHistory.getLast())) {
             System.out.println("Piece wasn't moved by player.");
             pieceCanBeMoved = false;
             for (Piece p : currentPlayer.getPiecesReverse()) {
@@ -219,19 +246,17 @@ public class State {
         return pieceCanBeMoved;
 
     }
-    
-    
+
     // ==========================================================================
-    // Operations to place a piece on the board
+    // Operations prior to placing a piece on the board
     // ==========================================================================
 
     /**
-     * Sets pieceToMove to be a piece that the currentPlayer has selected.
-     * This method is triggered every time the currentPlayer clicks on 
-     * a piece other than the one that is already chosen.
-     * If the previous piece selected was not null (i.e. the previous pieceToMove), 
-     * then it is stored in piecePrevMoved, and pieceToMove is updated with 
-     * the new piece selected.
+     * Sets pieceToMove to be a piece that the currentPlayer has selected. This
+     * method is triggered every time the currentPlayer clicks on a piece other than
+     * the one that is already chosen. If the previous piece selected was not null
+     * (i.e. the previous pieceToMove), then it is stored in piecePrevMoved, and
+     * pieceToMove is updated with the new piece selected.
      * 
      * @param piece : the piece that the currentPlayer would like to place
      */
@@ -249,15 +274,15 @@ public class State {
     }
 
     /**
-     * Moves the last piece placed on the board (hence, pieceToMove is not modified).
-     * Restores the previous state of the board (previous the particular piece was 
-     * even placed) and then uses the movePiece method to move the particular piece 
-     * to the desired location.
+     * Moves the last piece placed on the board (hence, pieceToMove is not
+     * modified). Restores the previous state of the board (previous the particular
+     * piece was even placed) and then uses the movePiece method to move the
+     * particular piece to the desired location.
      * 
-     * @param y : the y-comp of where the previously placed piece should go 
-     * (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go 
-     * (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     * @param y : the y-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      */
     public static void moveLastPlacedPiece(int y, int x) {
         if (boardHistory.size() < 1) {
@@ -268,126 +293,197 @@ public class State {
         State.movePiece(y, x);
     }
 
-
     /**
-     * Retrieves the current piece's structure represented as a 2D array and
-     * applies a counterclockwise rotation to the array using method ccRotation.
-     * pieceToMove is modified to be a new Piece (technically the same), but
-     * with its structure the rotated 2D array. Then, moveLastPlacedPiece
-     * is called; the arguments are the location at which piece (unrotated)
-     * was placed originally.
+     * Retrieves the current piece's structure represented as a 2D array and applies
+     * a counterclockwise rotation to the array using method ccRotation. pieceToMove
+     * is modified to be a new Piece (technically the same), but with its structure
+     * the rotated 2D array. Then, moveLastPlacedPiece is called; the arguments are
+     * the location at which piece (unrotated) was placed originally.
      */
     public static void rotatePlacedPiece() {
-        //piecePrevMoved = new Piece(pieceToMove.getStructure(), pieceToMove.getColor());
+        // piecePrevMoved = new Piece(pieceToMove.getStructure(),
+        // pieceToMove.getColor());
         pieceToMove = Piece.rotatedCC(pieceToMove);
         moveLastPlacedPiece(pieceToMovePos.y, pieceToMovePos.x);
     }
 
     /**
-     * Places the pieceToMove on the board at the specified location. 
+     * Places the pieceToMove on the board at the specified location.
      * 
-     * If the previous piece moved (piecePrevMoved) was of a different
-     * color than the (current) pieceToMove, then the piece is placed,
-     * keeping the last placed piece on the board (as this indicates a new 
-     * player is moving for the first time). However, if the previous piece 
-     * moved was of the same color, then given the pieceToMove has
-     * been updated, moveLastPlacedPiece is called.
+     * If the previous piece moved (piecePrevMoved) was of a different color than
+     * the (current) pieceToMove, then the piece is placed, keeping the last placed
+     * piece on the board (as this indicates a new player is moving for the first
+     * time). However, if the previous piece moved was of the same color, then given
+     * the pieceToMove has been updated, moveLastPlacedPiece is called.
      * 
-     * @param y : the y-comp of where the previously placed piece should go 
-     * (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go 
-     * (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     * @param y : the y-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      */
     public static void placePieceOnBoard(int y, int x) {
         if (piecePrevMoved == null || !piecePrevMoved.getColor().equals(pieceToMove.getColor())) {
             // System.out.println(piecePrevMoved);
             piecePrevMoved = Piece.copy(pieceToMove);
-            //boardHistory.add(deepCopyOfBoard(boardColors));
+            // boardHistory.add(deepCopyOfBoard(boardColors));
             State.movePiece(y, x);
         } else {
             State.moveLastPlacedPiece(y, x);
         }
     }
 
-
-
-    private static boolean movePiece(int y, int x) {
-        pieceToMovePos = new Point(x, y);
+    // ==========================================================================
+    // Operations to place a piece on the board
+    // ==========================================================================
+    
+    
+    /**
+     * If the length of the piece plus the y position OR the 
+     * width of the piece plus the x position is greater than the board height
+     * or board width respectively, false is returned.
+     * 
+     * @param the y-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     * @return if the piece is placed in bounds with the top corner 
+     *         of the piece being (y, x)
+     */
+    private static boolean inBounds(int y, int x) {
         int[][] pieceStructure = pieceToMove.getStructure();
-        // validating where the piece is placed; returning if piece would go out of
-        // bounds of the array
-        if (pieceStructure.length + y - 1 >= BOARD_HEIGHT || pieceStructure[0].length + x - 1 >= BOARD_WIDTH) {
+        if (pieceStructure.length + y - 1 >= BOARD_HEIGHT || 
+                pieceStructure[0].length + x - 1 >= BOARD_WIDTH) {
             System.out.println("Cannot place piece here: (" + y + ", " + x + ")");
             return false;
         }
-        // validating first move being at one of the board's corners
-        boolean boardCornerTouch = false;
-        for (int i = y; i < y + pieceStructure.length && !boardCornerTouch; i++) {
-            for (int j = x; j < x + pieceStructure[0].length && !boardCornerTouch; j++) {
+        return true;
+    }
+
+    /**
+     * Assesses whether the first piece placed by each player is touching 
+     * one of the four corners of the board. Does this by iterating through the
+     * piece's structure (2D array), and if none one of the piece's squares
+     * are touching any of the four corners, then false is returned.
+     * 
+     * @param the y-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     * @return if the first move is valid given Blokus rules
+     */
+    private static boolean validateFirstMove(int y, int x) {
+        if (currentPlayer.getPiecesSize() < 21) {
+            return true;
+        }
+        int[][] pieceStructure = pieceToMove.getStructure();
+        for (int i = y; i < y + pieceStructure.length; i++) {
+            for (int j = x; j < x + pieceStructure[0].length; j++) {
                 if (pieceStructure[i - y][j - x] == 1) {
                     if ((i == 0 && j == 0) || (i == BOARD_HEIGHT - 1 && j == 0) || (i == 0 && j == BOARD_WIDTH - 1)
                             || (i == BOARD_HEIGHT - 1 && j == BOARD_WIDTH - 1)) {
-
-                        boardCornerTouch = true;
-                        break;
+                        return true;
                     }
                 }
             }
         }
-        if (!boardCornerTouch && currentPlayer.getPiecesSize() == 21) {
-            System.out.println("The piece must be placed adjacent to a board corner.");
-            return false;
-        }
 
-        // validating using Blokus rules--corners must be of same color except on first
-        // turn
-        boolean cornerSameColorTouch = false;
+        System.out.println("The piece must be placed adjacent to a board corner.");
+        return false;
+    }
+
+    /**
+     * Determines whether the pieces placed by each player after their first 
+     * moves are touching the corner of a piece already placed of the same
+     * color. Iterates through each of the piece's squares' positions when the
+     * top left corner of the piece is placed at (y, x); if, for any of 
+     * those positions (squares) there is a color matching the piece's color at 
+     * one of the position's four corners, then the move is valid and true is 
+     * returned.
+     * 
+     * @param y : the y-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     * @return whether placing piece would touch the corner of another piece
+     *         of the same color
+     */
+    private static boolean validateCornerTouch(int y, int x) {
+        if (currentPlayer.getPieces().size() == 21) {
+            return true;
+        }
+        int[][] pieceStructure = pieceToMove.getStructure();
         for (int i = y; i < y + pieceStructure.length; i++) {
             for (int j = x; j < x + pieceStructure[0].length; j++) {
                 if (pieceStructure[i - y][j - x] == 1) {
-                    if (validateIndex(i - 1, j - 1) && boardColors[i - 1][j - 1].equals(pieceToMove.getColor())) {
-                        cornerSameColorTouch = true;
+                    if (validateIndex(i - 1, j - 1) 
+                            && boardColors[i - 1][j - 1].equals(pieceToMove.getColor())) {
+                        return true;
                     } else if (validateIndex(i + 1, j + 1)
                             && boardColors[i + 1][j + 1].equals(pieceToMove.getColor())) {
-                        cornerSameColorTouch = true;
+                        return true;
                     } else if (validateIndex(i + 1, j - 1)
                             && boardColors[i + 1][j - 1].equals(pieceToMove.getColor())) {
-                        cornerSameColorTouch = true;
+                        return true;
                     } else if (validateIndex(i - 1, j + 1)
                             && boardColors[i - 1][j + 1].equals(pieceToMove.getColor())) {
-                        cornerSameColorTouch = true;
+                        return true;
                     }
                 }
             }
         }
-        if (!cornerSameColorTouch && currentPlayer.getPiecesSize() < 21) {
-            System.out.println("Piece not touching corner of another piece with the same color.");
-            return false;
-        }
-
-        // validating using Blokus rules--no edge touch
-        boolean edgeDifferentColorTouch = true;
+        System.out.println("Piece not touching corner of another piece with the same color.");
+        return false;
+    }
+    
+    /**
+     * Determines whether the pieceToMove would touch the edge of another
+     * square/piece on the board of the same color if placed at (y, x).
+     * Iterates through each of the piece's squares' positions when the
+     * top left corner of the piece is placed at (y, x); if, for any of 
+     * those positions (squares) there is a color matching the piece's color at 
+     * one of the position's four edges, then the move is invalid and false is 
+     * returned.
+     * 
+     * @param y : the y-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     * @return whether placing piece would not touch the edge of another piece
+     *         of the same color
+     */
+    private static boolean validateEdges(int y, int x) {
+        int[][] pieceStructure = pieceToMove.getStructure();
         for (int i = y; i < y + pieceStructure.length; i++) {
             for (int j = x; j < x + pieceStructure[0].length; j++) {
                 if (pieceStructure[i - y][j - x] == 1) {
-                    if (validateIndex(i - 1, j) && boardColors[i - 1][j].equals(pieceToMove.getColor())) {
-                        edgeDifferentColorTouch = false;
-                    } else if (validateIndex(i + 1, j) && boardColors[i + 1][j].equals(pieceToMove.getColor())) {
-                        edgeDifferentColorTouch = false;
-                    } else if (validateIndex(i, j - 1) && boardColors[i][j - 1].equals(pieceToMove.getColor())) {
-                        edgeDifferentColorTouch = false;
-                    } else if (validateIndex(i, j + 1) && boardColors[i][j + 1].equals(pieceToMove.getColor())) {
-                        edgeDifferentColorTouch = false;
+                    if ((validateIndex(i - 1, j) && boardColors[i - 1][j].equals(pieceToMove.getColor())) || 
+                        (validateIndex(i + 1, j) && boardColors[i + 1][j].equals(pieceToMove.getColor())) || 
+                        (validateIndex(i, j - 1) && boardColors[i][j - 1].equals(pieceToMove.getColor())) || 
+                        (validateIndex(i, j + 1) && boardColors[i][j + 1].equals(pieceToMove.getColor()))) {
+                        System.out.println("Cannot move here. Would touch edge of same-colored piece.");
+                        return false;
                     }
                 }
             }
         }
-        if (!edgeDifferentColorTouch) {
-            System.out.println("Cannot move here. Would touch edge of same-colored piece.");
-            return false;
-        }
-
-        // validating using Blokus rules--no overlap with pieces already on the board
+        return true;
+    }
+    
+    /**
+     * Iterates through each position for which a piece's square would be
+     * if placed on the board, and if the position is of a color that is 
+     * not gray, indicating a piece is already at that position, 
+     * false is returned, indicating overlap.
+     * 
+     * @param y : the y-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     * @return whether placing the piece at (y, x) would cause the piece
+     * to overlap with other pieces already on the board
+     */
+    private static boolean noOverlap(int y, int x) {
+        int[][] pieceStructure = pieceToMove.getStructure();
         for (int i = y; i < y + pieceStructure.length; i++) {
             for (int j = x; j < x + pieceStructure[0].length; j++) {
                 if (pieceStructure[i - y][j - x] == 1 && !boardColors[i][j].equals(Color.GRAY)) {
@@ -396,22 +492,46 @@ public class State {
                 }
             }
         }
-
-        // updating the board
-        for (int i = y; i < y + pieceStructure.length; i++) {
-            for (int j = x; j < x + pieceStructure[0].length; j++) {
-                // coloring in board if array index of array representing piece is 1
-                if (pieceStructure[i - y][j - x] == 1) {
-                    State.setBoardColors(i, j, currentPlayer.getColor());
-                }
-            }
-        }
-
         return true;
     }
     
+
+    /**
+     * Using the methods above, determines if the piece can be moved. If it
+     * can, then performs the move operation by iterating through the piece's
+     * structure and copying the piece's color to the board (2D Color array, 
+     * boardColors) at the designated locations.
+     * 
+     * @param y : the y-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the previously placed piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     * @return if the piece moving operation was successful
+     */
+    private static boolean movePiece(int y, int x) {
+        pieceToMovePos = new Point(x, y);
+        int[][] pieceStructure = pieceToMove.getStructure();
+        
+        if (inBounds(y, x) && validateFirstMove(y, x) && validateCornerTouch (y, x) && 
+                validateEdges(y, x) && noOverlap(y, x)) {
+            for (int i = y; i < y + pieceStructure.length; i++) {
+                for (int j = x; j < x + pieceStructure[0].length; j++) {
+                    // coloring in board if index of 2D (rectangular) array representing piece is 1
+                    if (pieceStructure[i - y][j - x] == 1) {
+                        State.setBoardColors(i, j, currentPlayer.getColor());
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        return false;
+        
+    }
+
     /*
-     * helper methods 
+     * general helper methods
      */
 
     private static Color[][] deepCopyOfBoard(Color[][] currentBoard) {
@@ -423,12 +543,12 @@ public class State {
         }
         return clonedBoardColors;
     }
-    
+
     private static Player copyPlayer(Player p) {
         return new Player(p.getPieces(), p.getName(), p.getColor(), p.getNumber());
     }
 
-    private static boolean deepEquals(Color[][] board1, Color[][] board2) {
+    private static boolean boardsDeepEquals(Color[][] board1, Color[][] board2) {
         for (int i = 0; i < BOARD_HEIGHT; i++) {
             for (int j = 0; j < BOARD_WIDTH; j++) {
                 if (!board1[i][j].equals(board2[i][j])) {
@@ -438,7 +558,7 @@ public class State {
         }
         return true;
     }
-    
+
     public static void printBoard(Color[][] arr) {
         for (int i = 0; i < arr.length; i++) {
             for (int j = 0; j < arr[i].length; j++) {

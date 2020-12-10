@@ -103,7 +103,7 @@ public class Player{
         if (o instanceof Player) {
             Player u = (Player) o;
             result = this.number == u.getNumber() && this.name.equals(u.getName()) 
-                    && this.color.equals(u.getColor()) && this.pieces.equals(u.getPieces());
+                    && this.color.equals(u.getColor());
         }
         return result;
     }
