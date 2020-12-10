@@ -1,16 +1,9 @@
-import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.Set;
+
 
 import javax.swing.*;
-import javax.swing.filechooser.FileSystemView;
 
 public class Game implements Runnable {
 
@@ -24,15 +17,21 @@ public class Game implements Runnable {
         
         JPanel panel = new JPanel();
         frame.getContentPane().add(panel);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         
         StateLabel stateLabel = new StateLabel();
         panel.add(stateLabel);
         
         Board board = new Board ();
+        board.setMaximumSize(board.getPreferredSize());
+        board.setMinimumSize(board.getPreferredSize());
         panel.add(board);
         
         PlayerPieceSet pset = new PlayerPieceSet();
         panel.add(pset);
+        
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new FlowLayout());
         
         JButton rotPiece = new JButton("Rotate Piece");
         rotPiece.addActionListener( new ActionListener() {
@@ -41,7 +40,7 @@ public class Game implements Runnable {
                 board.repaint();
             }
         });
-        panel.add(rotPiece);
+        buttons.add(rotPiece);
         
         JButton nextTurn = new JButton("Next Turn");
         nextTurn.addActionListener( new ActionListener() {
@@ -49,10 +48,11 @@ public class Game implements Runnable {
                 State.nextTurn();
                 board.repaint();
                 pset.repaint();
+                pset.deselectAll();
                 stateLabel.repaint();
             }
         });
-        panel.add(nextTurn);
+        buttons.add(nextTurn);
         
         JButton undo = new JButton("Undo Move");
         undo.addActionListener( new ActionListener() {
@@ -64,27 +64,43 @@ public class Game implements Runnable {
                 
             }
         });
-        panel.add(undo);
+        buttons.add(undo);
         
-
+        panel.add(buttons);
+        
         JMenuBar menuBar = new JMenuBar();
+        
         JMenu fileMenu = new JMenu("File");
-        JMenuItem saveAsItem = new JMenuItem("Save As..."); 
-        //JMenuItem saveItem = new JMenuItem("Save..."); 
+        JMenuItem saveAsItem = new JMenuItem("Save As...");
         JMenuItem openItem = new JMenuItem("Open"); 
+        saveAsItem.addActionListener(new SaveGame(frame));
+        openItem.addActionListener(new OpenGame(frame, board, pset, stateLabel));
+        
         fileMenu.add(saveAsItem); 
-        //fileMenu.add(saveItem); 
-        fileMenu.add(openItem); 
+        fileMenu.add(openItem);
+        
+        JMenu helpMenu = new JMenu("Help");
+        JMenuItem aboutGame = new JMenuItem("About Game");
+        JMenuItem gameInstructions = new JMenuItem("Game Instructions");
+        JMenuItem gameFeatures = new JMenuItem("Game Features");
+        aboutGame.addActionListener(new InfoWindowOpener(frame, AboutExcerpts.ABOUT_GAME));
+        gameInstructions.addActionListener(new InfoWindowOpener(frame, AboutExcerpts.GAME_INSTRUCTIONS));
+        gameFeatures.addActionListener(new InfoWindowOpener(frame, AboutExcerpts.GAME_FEATURES));
+        
+        helpMenu.add(aboutGame);
+        helpMenu.add(gameInstructions);
+        helpMenu.add(gameFeatures);
+        
         menuBar.add(fileMenu);
-        saveAsItem.addActionListener(new SaveGame());
-        openItem.addActionListener(new OpenGame(board, pset, stateLabel));
+        menuBar.add(helpMenu);
+        
         frame.setJMenuBar(menuBar);
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setResizable(true);
         frame.setVisible(true);
-        frame.setSize(1500, 1000);
+        frame.setSize(1280, 800);
     }
     
     
