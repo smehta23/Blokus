@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Player{
 
-    private static int playerNumber = 1;
+    private static int playerNumber = 0;
     private Set<Piece> pieces;
     private String name;
     private Color color;
@@ -16,10 +16,10 @@ public class Player{
     
     
     public Player() {
-        this.name = "Player" + playerNumber;
+        this.name = "Player" + (playerNumber + 1);
         this.number = playerNumber;
         System.out.println(playerNumber);
-        this.color = State.GAME_COLORS[number - 1];
+        this.color = State.GAME_COLORS[number];
         this.pieces = new HashSet<Piece>();
         GamePieces [] gamePieces = GamePieces.class.getEnumConstants();
         for (GamePieces piece : gamePieces) {
@@ -42,18 +42,10 @@ public class Player{
     
     public boolean pieceMoved(Piece p) {
         return pieces.remove(p);
-        //this.pieceMoved(p.getStructure());
     }
     
     public void pieceMoved(int [][] pieceStructure) {
         pieceMoved(new Piece(pieceStructure, color));
-//        boolean removed = false;
-//        int rotateDegree = 0;
-//        while (!removed && rotateDegree <= 360) {
-//            removed = pieces.remove(new Piece(pieceStructure, color));
-//            pieceStructure = State.ccRotation(pieceStructure);
-//            rotateDegree+=90;
-//        }
     }
     
 
