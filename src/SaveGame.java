@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.BufferedWriter;
@@ -9,11 +10,17 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileSystemView;
 
 public class SaveGame implements ActionListener {
     File file;
     BufferedWriter writer;
+    Frame frame;
+    
+    public SaveGame(Frame frame) {
+        this.frame = frame;
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -22,9 +29,10 @@ public class SaveGame implements ActionListener {
 
         java.util.Date date = new java.util.Date();
         String timeStamp = "" + (new Timestamp(date.getTime()));
-        timeStamp.replace("/", "_");
-        timeStamp.replace(".", "-");
-        timeStamp.replace(":", "_");
+        timeStamp = timeStamp.replace("/", "_");
+        timeStamp = timeStamp.replace(".", "");
+        timeStamp = timeStamp.replace(":", "");
+        timeStamp = timeStamp.replace(" ", "_");
 
         fileChooser.setSelectedFile(new File("board_" + timeStamp + ".txt"));
 
@@ -40,14 +48,15 @@ public class SaveGame implements ActionListener {
                 }
                 writeCurrentPlayer();
                 writeTurnNumber();
+                writeGameStatus();
                 writer.close();
             } catch (IOException excp) {
-                System.out.println("Error loading file.");
+                JOptionPane.showMessageDialog(frame, "Error loading file.");
             }
         }
     }
 
-    public void writeGameBoard() {
+    private void writeGameBoard() {
         try {
             Color[][] currentBoard = State.getBoardColors();
             for (int i = 0; i < currentBoard.length; i++) {
@@ -58,11 +67,11 @@ public class SaveGame implements ActionListener {
             writer.newLine();
 
         } catch (IOException excp) {
-            System.out.println("Error fetching game board/writing to file.");
+            JOptionPane.showMessageDialog(frame, "Error fetching game board/writing to file.");
         }
     }
 
-    public void writePlayerPieceSet(Player player) {
+    private void writePlayerPieceSet(Player player) {
         try {
             Set<Piece> playerPieces = player.getPieces();
             for (Piece p : playerPieces) {
@@ -70,7 +79,7 @@ public class SaveGame implements ActionListener {
             }
             writer.write("\n");
         } catch (IOException excp) {
-            System.out.println("Error fetching game pieces/writing to file.");
+            JOptionPane.showMessageDialog(frame, "Error fetching game pieces/writing to file.");
         }
     }
     
@@ -79,7 +88,7 @@ public class SaveGame implements ActionListener {
             writer.write("" + Integer.toHexString(State.getCurrentPlayer().getColor().getRGB()));
             writer.write("\n");
         } catch (IOException excp) {
-            System.out.println("Error fetching current player/writing to file.");
+            JOptionPane.showMessageDialog(frame, "Error fetching current player/writing to file.");
         }
 
     }
@@ -87,8 +96,29 @@ public class SaveGame implements ActionListener {
     private void writeTurnNumber() {
         try {
             writer.write("" + Integer.toHexString(State.getTurnNumber()));
+            writer.write("\n");
         } catch (IOException excp) {
-            System.out.println("Error fetching current turn number/writing to file.");
+            JOptionPane.showMessageDialog(frame, "Error fetching current turn number/writing to file.");
+        }
+    }
+    
+    private void writeGameStatus() {
+        try {
+            if (!State.getStatus().equals("")) {
+                String gameStatus = State.getStatus();
+                for (int i = 0; i < gameStatus.length(); i++) { 
+                    if (Character.isDigit(gameStatus.charAt(i))) {
+                        int playerNum = Integer.parseInt(gameStatus.charAt(i) + "");
+                        writer.write("" + Integer.toBinaryString(playerNum));
+                    }
+                }
+            }
+            else {
+                writer.write("-");
+            }
+            
+        } catch (IOException excp) {
+            JOptionPane.showMessageDialog(frame, "Error fetching game status/writing to file.");
         }
     }
 
