@@ -44,6 +44,12 @@ public class PlayerPieceSet extends JComponent{
         }
     }
     
+    public void deselectAll() {
+        for (Piece piece : pieces) {
+            piece.toggleDeselected();
+        }
+    }
+    
     
     private class PieceSelectedListener extends MouseAdapter {
         private Piece piece;
