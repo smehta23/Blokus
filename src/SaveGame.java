@@ -24,7 +24,8 @@ public class SaveGame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        JFileChooser fileChooser = new JFileChooser(
+                FileSystemView.getFileSystemView().getHomeDirectory());
         fileChooser.setCurrentDirectory(null);
 
         java.util.Date date = new java.util.Date();
@@ -98,7 +99,8 @@ public class SaveGame implements ActionListener {
             writer.write("" + Integer.toHexString(State.getTurnNumber()));
             writer.write("\n");
         } catch (IOException excp) {
-            JOptionPane.showMessageDialog(frame, "Error fetching current turn number/writing to file.");
+            JOptionPane.showMessageDialog(frame, 
+                    "Error fetching current turn number/writing to file.");
         }
     }
     
@@ -112,8 +114,7 @@ public class SaveGame implements ActionListener {
                         writer.write("" + Integer.toBinaryString(playerNum));
                     }
                 }
-            }
-            else {
+            } else {
                 writer.write("-");
             }
             

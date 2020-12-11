@@ -5,8 +5,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
 
-public class InfoWindowOpener implements ActionListener{
-    
+public class InfoWindowOpener implements ActionListener {
 
     Frame frame;
     String windowTitle;
@@ -17,6 +16,7 @@ public class InfoWindowOpener implements ActionListener{
         this.text = windowTitle.getExcerpt();
         this.frame = frame;
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         JDialog dialog = new JDialog(frame, windowTitle);
@@ -29,9 +29,7 @@ public class InfoWindowOpener implements ActionListener{
         dialog.setVisible(true);
         dialog.setSize(400, 400);
         dialog.setResizable(false);
-        
-    }
 
-    
+    }
 
 }
