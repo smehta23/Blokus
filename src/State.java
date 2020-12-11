@@ -1,8 +1,9 @@
 import java.awt.Color;
 import java.awt.Point;
-import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Set;
+import java.util.List;
 
 public class State {
 
@@ -26,14 +27,10 @@ public class State {
     private static Player currentPlayer = players[0];
     private static int turnNumber = 0;
     private static String gameStatus = "";
-    private static boolean turn_finish = true;
 
     public static void undo() {
-        if (boardHistory.size() > 1) {
-//            if (turn_finish == true) {
-//                boardHistory.removeLast();
-//                turn_finish = false;
-//            }
+        if (boardHistory.size() > 1 && pieceHistory.size() > 0) {
+
             boardHistory.removeLast();
             //boardHistory.removeLast();
             State.setBoardColors(deepCopyOfBoard(boardHistory.getLast()));
@@ -51,7 +48,8 @@ public class State {
             pieceHistory.removeLast();
             currentPlayer = prevPlayer;
             boardHistory.add(deepCopyOfBoard(getBoardColors()));
-            //updateGameStatus();
+            resetStatus();
+            resetPieceToMove();
             
             turnNumber--;
         }
@@ -63,9 +61,9 @@ public class State {
     public static Player getCurrentPlayer() {
         return copyPlayer(currentPlayer);
     }
-
-    public static void setCurrentPlayer(Player p) {
-        currentPlayer = copyPlayer(p);
+    
+    public static void setCurrentPlayer(int num) {
+        currentPlayer = players[num];
     }
 
     public static Player getPlayer(int num) {
@@ -128,11 +126,26 @@ public class State {
     }
 
     /*
-     * get the game status
+     * mutators/accessors for game status
      */
     public static String getStatus() {
         return gameStatus;
     }
+    
+    public static void setStatus(Integer [] winnerNums) {
+        gameStatus = "GAME OVER: ";
+        for (Integer i : Arrays.asList(winnerNums)) {
+            Player p = State.getPlayer(i);
+            gameStatus += p.getName() + ", ";
+        }
+        gameStatus = gameStatus.substring(0, gameStatus.length()-2);
+        gameStatus = gameStatus + " wins!";
+    }
+    
+    public static void resetStatus() {
+        gameStatus = "";
+    }
+    
 
     /*
      * mutator/accessors for turn number
@@ -144,6 +157,29 @@ public class State {
     public static void setTurnNumber(int n) {
         turnNumber = n;
     }
+    
+    /*
+     * resetting the pieceToMove (mutator)
+     */
+    public static void resetPieceToMove() {
+        pieceToMove = null;
+    }
+    
+
+    /**
+     * Sets the board's colors to boardColors. Deletes everything 
+     * from the boardHistory LinkedList, as the current game is completely
+     * scrapped. Finally, adds the boardColors passed in to the boardHistory 
+     * LinkedList.
+     * 
+     * @param boardColors : the new starting state of the board
+     */
+    public static void resetGame(Color[][] boardColors) {
+        boardHistory = new LinkedList<Color[][]>();
+        State.setBoardColors(State.deepCopyOfBoard(boardColors));
+        boardHistory.add(State.deepCopyOfBoard(boardColors));
+        
+    }
 
     // ==========================================================================
     // Next turn operations
@@ -154,10 +190,12 @@ public class State {
      * occurs in the array of Players.
      */
     public static void nextTurn() {
-        finishTurn();
-        turnNumber++;
-        System.out.println(turnNumber);
-        currentPlayer = players[turnNumber % NUM_OF_PLAYERS];
+        if (gameStatus.equals("")) { // indicates game is not over
+            finishTurn();
+            turnNumber++;
+            System.out.println(turnNumber);
+            currentPlayer = players[turnNumber % NUM_OF_PLAYERS];
+        }
     }
 
     /**
@@ -174,8 +212,7 @@ public class State {
         pieceHistory.add(pieceToMove);
         boardHistory.add(deepCopyOfBoard(boardColors)); // save board state
         updateGameStatus();
-        pieceToMove = null; // Reinitialize the pieceToMove to null
-        turn_finish = true;
+        resetPieceToMove(); // Reinitialize the pieceToMove to null
     }
 
     /*
@@ -198,14 +235,33 @@ public class State {
             System.out.println("Player " + (i + 1) + " cannot move");
             currentPlayer = players[(State.getPlayerNum(currentPlayer) + 1) % NUM_OF_PLAYERS];
         }
+        currentPlayer = originalCurrentPlayer;
+        
+        findWinners();
 
-        Player lowestScorePlayer = players[0];
+    }
+    
+    /**
+     *  Finds winner(s) if game is over. Updates the gameStatus string
+     *  with the winner(s). A LinkedList is used to keep track of 
+     *  ties.
+     */
+    public static void findWinners() {
+        LinkedList<Player> lowestScorePlayers = new LinkedList<Player>();
+        lowestScorePlayers.add(players[0]);
         for (int i = 1; i < players.length; i++) {
-            if (players[i].getScore() < lowestScorePlayer.getScore()) {
-                lowestScorePlayer = players[i];
+            if (players[i].getScore() < lowestScorePlayers.getFirst().getScore()) {
+                lowestScorePlayers.set(0, players[i]);
+            }
+            else if(players[i].getScore() == lowestScorePlayers.getFirst().getScore()) {
+                lowestScorePlayers.add(players[i]);
             }
         }
-        gameStatus = "GAME OVER: " + lowestScorePlayer.getName() + " wins!";
+        Integer [] winnerNums = new Integer[lowestScorePlayers.size()];
+        for (int i = 0; i < winnerNums.length; i++) {
+            winnerNums[i] = lowestScorePlayers.get(i).getNumber();
+        }
+        State.setStatus(winnerNums);
     }
 
     /**
@@ -284,9 +340,9 @@ public class State {
      * piece was even placed) and then uses the movePiece method to move the
      * particular piece to the desired location.
      * 
-     * @param y : the y-comp of where the previously placed piece should go
+     * @param y : the y-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go
+     * @param x : the x-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      */
     public static void moveLastPlacedPiece(int y, int x) {
@@ -322,9 +378,9 @@ public class State {
      * time). However, if the previous piece moved was of the same color, then given
      * the pieceToMove has been updated, moveLastPlacedPiece is called.
      * 
-     * @param y : the y-comp of where the previously placed piece should go
+     * @param y : the y-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go
+     * @param x : the x-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      */
     public static void placePieceOnBoard(int y, int x) {
@@ -339,6 +395,17 @@ public class State {
         }
     }
     
+    /**
+     * Given the position (y, x), iterates through the pieceToMove
+     * and copies its structure (color by color) to the 2D array boardColors
+     * at the point (y, x), row-major form; the color copied to the boardColors 
+     * array is darker indicating the piece is previewed onto the board.
+     * 
+     * @param y : the y-comp of where the piece should go
+     *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
+     * @param x : the x-comp of where the piece should go
+     *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
+     */
     public static void previewPiece(int y, int x) {
         int[][] pieceStructure = pieceToMove.getStructure();
         for (int i = y; i < y + pieceStructure.length; i++) {
@@ -361,9 +428,9 @@ public class State {
      * width of the piece plus the x position is greater than the board height
      * or board width respectively, false is returned.
      * 
-     * @param the y-comp of where the previously placed piece should go
+     * @param the y-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go
+     * @param x : the x-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      * @return if the piece is placed in bounds with the top corner 
      *         of the piece being (y, x)
@@ -384,9 +451,9 @@ public class State {
      * piece's structure (2D array), and if none one of the piece's squares
      * are touching any of the four corners, then false is returned.
      * 
-     * @param the y-comp of where the previously placed piece should go
+     * @param the y-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go
+     * @param x : the x-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      * @return if the first move is valid given Blokus rules
      */
@@ -419,9 +486,9 @@ public class State {
      * one of the position's four corners, then the move is valid and true is 
      * returned.
      * 
-     * @param y : the y-comp of where the previously placed piece should go
+     * @param y : the y-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go
+     * @param x : the x-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      * @return whether placing piece would touch the corner of another piece
      *         of the same color
@@ -463,9 +530,9 @@ public class State {
      * one of the position's four edges, then the move is invalid and false is 
      * returned.
      * 
-     * @param y : the y-comp of where the previously placed piece should go
+     * @param y : the y-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go
+     * @param x : the x-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      * @return whether placing piece would not touch the edge of another piece
      *         of the same color
@@ -494,9 +561,9 @@ public class State {
      * not gray, indicating a piece is already at that position, 
      * false is returned, indicating overlap.
      * 
-     * @param y : the y-comp of where the previously placed piece should go
+     * @param y : the y-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go
+     * @param x : the x-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      * @return whether placing the piece at (y, x) would cause the piece
      * to overlap with other pieces already on the board
@@ -521,9 +588,9 @@ public class State {
      * structure and copying the piece's color to the board (2D Color array, 
      * boardColors) at the designated locations.
      * 
-     * @param y : the y-comp of where the previously placed piece should go
+     * @param y : the y-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_HEIGHT - 1)
-     * @param x : the x-comp of where the previously placed piece should go
+     * @param x : the x-comp of where the piece should go
      *          (relative to board). Must be in the range (0, BOARD_WIDTH - 1)
      * @return if the piece moving operation was successful
      */
