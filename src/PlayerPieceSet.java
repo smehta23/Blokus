@@ -51,6 +51,7 @@ public class PlayerPieceSet extends JComponent {
                 piece.toggleDeselected();
             }
             piece.toggleSelected();
+            repaint();
             State.setPieceToMove(piece);
         }
     }
